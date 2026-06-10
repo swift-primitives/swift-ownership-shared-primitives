@@ -34,7 +34,16 @@ private typealias HeapColumn<E: ~Copyable> =
 
 private typealias SharedColumn<E: ~Copyable> = Shared<E, HeapColumn<E>>
 
-private func makeShared<E: ~Copyable>(capacity: UInt) -> SharedColumn<E> {
+// Split on element copyability, mirroring `Shared`'s constructors: the Copyable form
+// resolves the clone-capturing init (CoW-capable); the move-only form resolves the
+// statically-unique init. A single `~Copyable`-generic helper would silently build
+// every column through the move-only constructor — `prepareForMutation`'s backstop
+// traps on the first shared mutation of such a column.
+private func makeShared<E>(capacity: UInt) -> SharedColumn<E> {
+    SharedColumn<E>(HeapColumn<E>(minimumCapacity: Index<E>.Count(capacity)))
+}
+
+private func makeSharedMoveOnly<E: ~Copyable>(capacity: UInt) -> SharedColumn<E> {
     SharedColumn<E>(HeapColumn<E>(minimumCapacity: Index<E>.Count(capacity)))
 }
 
@@ -111,7 +120,7 @@ struct SharedTests {
     func `move-only column is statically unique and drains through the box`() {
         Probe.reset()
         do {
-            var a: SharedColumn<Item> = makeShared(capacity: 2)
+            var a: SharedColumn<Item> = makeSharedMoveOnly(capacity: 2)
             a.appendAssumingUnique(Item(5, value: 50))
             a.appendAssumingUnique(Item(6, value: 60))
             let taken = a.removeLastAssumingUnique()

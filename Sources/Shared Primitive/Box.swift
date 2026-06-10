@@ -35,10 +35,22 @@ internal final class Box<Wrapped: ~Copyable> {
     @usableFromInline
     internal let _drain: @Sendable (inout Wrapped) -> Void
 
+    /// The column-correct deep-copy strategy, captured at construction alongside the drain.
+    /// `nil` on statically-unique columns (`~Copyable` elements — the wrapper cannot be
+    /// duplicated, so uniqueness never needs restoring). Non-`nil` whenever the element is
+    /// `Copyable`, where the box CAN become shared: `prepareForMutation()` clones through it.
     @usableFromInline
-    internal init(_ wrapped: consuming Wrapped, drain: @escaping @Sendable (inout Wrapped) -> Void) {
+    internal let _clone: (@Sendable (borrowing Wrapped) -> Wrapped)?
+
+    @usableFromInline
+    internal init(
+        _ wrapped: consuming Wrapped,
+        drain: @escaping @Sendable (inout Wrapped) -> Void,
+        clone: (@Sendable (borrowing Wrapped) -> Wrapped)? = nil
+    ) {
         self.wrapped = wrapped
         self._drain = drain
+        self._clone = clone
     }
 
     deinit {

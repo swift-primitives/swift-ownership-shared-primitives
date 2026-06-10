@@ -40,6 +40,17 @@ extension Shared: Store.`Protocol` where Element: ~Copyable, B: ~Copyable {
     public mutating func move(at slot: Index<Element>) -> Element {
         box.wrapped.move(at: slot)
     }
+
+    /// The semantic mutation gate — restores uniqueness before generic seam writes.
+    ///
+    /// This is the one seam operation that IS CoW-checked: generic ADT code calls it
+    /// before its first write in any semantic mutation, making protocol-keyed mutation
+    /// (subscript `_modify`, removal, in-place edits) copy-on-write-correct on this
+    /// column without per-column pins. The other seam ops stay the unchecked fast lane.
+    @inlinable
+    public mutating func prepareForMutation() {
+        ensureUnique()
+    }
 }
 
 extension Shared: Buffer.`Protocol` where Element: ~Copyable, B: ~Copyable {
