@@ -41,6 +41,7 @@ public import Index_Primitives
 /// `~Copyable` struct OMITS the user deinit (the durable repro:
 /// `swift-institute/Experiments/cow-box-deinit-omission-miscompile`). With the drain, the
 /// storage oracle behind the box tears down an EMPTY buffer — correct whether or not it runs.
+@frozen
 public struct Shared<
     Element: ~Copyable,
     B: Store.`Protocol` & Buffer.`Protocol` & ~Copyable
