@@ -93,9 +93,15 @@ extension Shared where Element: ~Copyable, B: ~Copyable {
     }
 
     /// Appends an element on the statically-unique (~Copyable-element) column.
+    ///
+    /// The name states the caller's obligation: on a `Copyable`-element column this is
+    /// the unchecked lane (debug builds assert the box really is unique — the `sending`
+    /// spike confirmed no type-level proof of refcount uniqueness exists, report
+    /// §ADDENDUM (i), so the assertion is the standing mitigation).
     @inlinable
     public mutating func appendAssumingUnique(_ element: consuming Element)
     where B == Buffer<Storage<Memory.Allocator<Memory.Heap>.System>.Contiguous<Element>>.Linear {
+        assert(isKnownUniquelyReferenced(&box), "AssumingUnique on a shared box")
         box.wrapped.append(element)
     }
 
@@ -109,11 +115,13 @@ extension Shared where Element: ~Copyable, B: ~Copyable {
     }
 
     /// Removes and returns the last element on the statically-unique column.
+    /// Debug builds assert uniqueness (see `appendAssumingUnique`).
     @inlinable
     public mutating func removeLastAssumingUnique()
         -> Element
     where B == Buffer<Storage<Memory.Allocator<Memory.Heap>.System>.Contiguous<Element>>.Linear {
-        box.wrapped.removeLast()
+        assert(isKnownUniquelyReferenced(&box), "AssumingUnique on a shared box")
+        return box.wrapped.removeLast()
     }
 
     /// Ensures at least `minimumCapacity` slots, growing (uniquely) if needed.

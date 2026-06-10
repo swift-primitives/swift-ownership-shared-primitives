@@ -1,5 +1,9 @@
 import Shared_Primitive
+import Buffer_Primitive
 import Buffer_Linear_Primitive
+import Storage_Contiguous_Primitives
+import Memory_Heap_Primitives
+import Memory_Allocator_Primitive
 import Index_Primitives
 import Testing
 

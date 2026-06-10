@@ -44,12 +44,14 @@ extension Shared where Element: ~Copyable, B: ~Copyable {
     }
 
     /// Mutable span on the statically-unique (~Copyable-element) column.
+    /// Debug builds assert uniqueness (see `appendAssumingUnique`).
     @inlinable
     public mutating func withMutableSpanAssumingUnique<R, Failure: Swift.Error>(
         _ body: (inout Swift.MutableSpan<Element>) throws(Failure) -> R
     ) throws(Failure) -> R
     where B == Buffer<Storage<Memory.Allocator<Memory.Heap>.System>.Contiguous<Element>>.Linear {
-        try Self._withMutableSpan(&box.wrapped, body)
+        assert(isKnownUniquelyReferenced(&box), "AssumingUnique on a shared box")
+        return try Self._withMutableSpan(&box.wrapped, body)
     }
 
     // The hop helpers: the buffer arrives as a PARAMETER (borrow / inout) — struct-containment
