@@ -1,0 +1,50 @@
+// ===----------------------------------------------------------------------===//
+//
+// This source file is part of the swift-primitives open source project
+//
+// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
+// Licensed under Apache License v2.0
+//
+// See LICENSE for license information
+//
+// ===----------------------------------------------------------------------===//
+
+/// The one class in the tower above Memory — the refcounted box behind `Shared`.
+///
+/// ## The drain-box rule (R-5, binding)
+///
+/// The box's `deinit` OWNS element teardown: it drains the wrapped buffer through public
+/// mutating API (the column-correct strategy captured at construction), then closes with
+/// `_fixLifetime(self)` — the stdlib `_ContiguousArrayStorage` idiom. Relying on the wrapped
+/// struct's own deinit oracle is UNSOUND here: under `-O`, once `isKnownUniquelyReferenced`
+/// has been applied to the box, the devirtualized release synthesizes a destroy of the
+/// generic-namespace-nested `~Copyable` struct that OMITS its user deinit while still
+/// destroying its fields (elements leak, bytes are freed). Durable repro:
+/// `swift-institute/Experiments/cow-box-deinit-omission-miscompile`. With the drain, the
+/// struct oracle behind the box tears down an EMPTY buffer — count-driven, so correctness no
+/// longer depends on whether the compiler runs it.
+///
+/// The drain strategy is a stored `@Sendable` closure so the box stays COLUMN-AGNOSTIC: each
+/// pinned `Shared` construction site supplies the drain its column needs (linear prefix today;
+/// ring/linked disciplines supply theirs when their ADTs arrive).
+@usableFromInline
+internal final class Box<Wrapped: ~Copyable> {
+    @usableFromInline
+    internal var wrapped: Wrapped
+
+    @usableFromInline
+    internal let _drain: @Sendable (inout Wrapped) -> Void
+
+    @usableFromInline
+    internal init(_ wrapped: consuming Wrapped, drain: @escaping @Sendable (inout Wrapped) -> Void) {
+        self.wrapped = wrapped
+        self._drain = drain
+    }
+
+    deinit {
+        _drain(&wrapped)
+        _fixLifetime(self)
+    }
+}
+
+extension Box: @unchecked Sendable where Wrapped: Sendable & ~Copyable {}
