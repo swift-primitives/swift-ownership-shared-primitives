@@ -36,6 +36,7 @@ let package = Package(
                 .product(name: "Buffer Primitive", package: "swift-buffer-primitives"),
                 .product(name: "Buffer Protocol Primitives", package: "swift-buffer-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
+                .product(name: "Buffer Linear Bounded Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Ring Primitive", package: "swift-buffer-ring-primitives"),
                 .product(name: "Buffer Ring Bounded Primitive", package: "swift-buffer-ring-primitives"),
                 .product(name: "Storage Generational Primitives", package: "swift-storage-arena-primitives"),
@@ -56,6 +57,7 @@ let package = Package(
             dependencies: [
                 "Shared Primitive",
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
+                .product(name: "Buffer Linear Bounded Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Ring Primitive", package: "swift-buffer-ring-primitives"),
                 .product(name: "Buffer Ring Bounded Primitive", package: "swift-buffer-ring-primitives"),
                 .product(name: "Buffer Primitives Test Support", package: "swift-buffer-primitives"),
