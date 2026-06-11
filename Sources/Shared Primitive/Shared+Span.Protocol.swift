@@ -71,7 +71,7 @@ extension Shared: Span.`Protocol` where B: Span.`Protocol`, B: ~Copyable {
         borrowing get {
             let raw = unsafe Self._window(of: box.wrapped)
             let typed = unsafe (raw.base?.assumingMemoryBound(to: Element.self))
-                ?? UnsafePointer<Element>(bitPattern: MemoryLayout<Int>.alignment).unsafelyUnwrapped
+                ?? UnsafePointer<Element>(bitPattern: MemoryLayout<Element>.alignment).unsafelyUnwrapped
             let laundered = unsafe Swift.Span(_unsafeStart: typed, count: raw.base == nil ? 0 : raw.count)
             return unsafe _overrideLifetime(laundered, borrowing: self)
         }
