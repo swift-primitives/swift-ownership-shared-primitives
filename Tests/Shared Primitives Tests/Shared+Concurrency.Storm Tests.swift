@@ -108,15 +108,18 @@ struct SharedConcurrencyStormTests {
                         case 0:
                             mine.append(t &+ k)
                             model.append(t &+ k)
+
                         case 2 where model.count > 1:
                             let got = mine.removeLast()
                             let want = model.removeLast()
                             good = good && (got == want)
+
                         case 4:
                             mine.withMutableSpan { span in
                                 if span.count > 0 { span[0] &+= 1 }
                             }
                             if model.count > 0 { model[0] &+= 1 }
+
                         default:
                             let consistent = mine.withSpan { span in
                                 guard span.count == model.count else { return false }
