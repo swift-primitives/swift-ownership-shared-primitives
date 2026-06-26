@@ -41,6 +41,7 @@ let package = Package(
                 .product(name: "Storage Generational Primitives", package: "swift-storage-generational-primitives"),
                 .product(name: "Hash Indexed Primitive", package: "swift-hash-table-primitives"),
                 .product(name: "Hash Primitives", package: "swift-hash-primitives"),
+                .product(name: "Store Primitive", package: "swift-storage-primitives"),
                 .product(name: "Store Protocol Primitives", package: "swift-storage-primitives"),
                 .product(name: "Storage Contiguous Primitives", package: "swift-storage-primitives"),
                 .product(name: "Memory Heap Primitives", package: "swift-memory-heap-primitives"),
