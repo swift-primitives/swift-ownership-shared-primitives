@@ -31,7 +31,7 @@ import Cardinal_Primitives
 // is part of the shipped door and belongs in the baseline.
 
 typealias LinearColumn =
-    Buffer<Storage<Memory.Allocator<Memory.Heap>.System>.Contiguous<Int>>.Linear
+    Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Int>>.Linear
 
 typealias SharedColumn = Shared<Int, LinearColumn>
 
