@@ -50,6 +50,7 @@ let package = Package(
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Span Protocol Primitives", package: "swift-span-primitives"),
                 .product(name: "Ownership Box Primitives", package: "swift-ownership-primitives"),
+                .product(name: "Ownership Primitive", package: "swift-ownership-primitives"),
             ]
         ),
 
