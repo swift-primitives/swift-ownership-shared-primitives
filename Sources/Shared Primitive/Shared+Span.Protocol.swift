@@ -39,7 +39,7 @@ public import Ownership_Box_Primitives
 // - No mutation can occur through THIS handle while the span lives (exclusivity
 //   on `self`).
 // - Sibling handles never mutate THIS box: every checked mutation path gates
-//   (`ensureUnique`/`prepareForMutation`) and a non-unique gate DETACHES the
+//   (`ensureUnique`/`unshare`) and a non-unique gate DETACHES the
 //   mutating sibling into a fresh box first — this box's contents are immutable
 //   from the outside for the span's whole life.
 // - The unchecked `…AssumingUnique` lane is convention-restricted and

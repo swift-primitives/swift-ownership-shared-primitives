@@ -59,7 +59,7 @@ extension Shared: Store.`Protocol` where Element: ~Copyable, B: ~Copyable {
     /// mutators above ALSO self-gate (defense in depth + Sendable soundness); after the
     /// gate runs once, their per-op checks are clone-free true branches.
     @inlinable
-    public mutating func prepareForMutation() {
+    public mutating func unshare() {
         ensureUnique()
     }
 }

@@ -57,9 +57,9 @@ extension Bench {
 
         // 1. The gate alone, on an always-unique box.
         results.append(Result(
-            name: "gate.prepareForMutation", subject: "shared.unique", n: n, opsPerBatch: gateOps,
+            name: "gate.unshare", subject: "shared.unique", n: n, opsPerBatch: gateOps,
             perOpNs: sample(opsPerBatch: gateOps) {
-                for _ in 0..<gateOps { s.prepareForMutation() }
+                for _ in 0..<gateOps { s.unshare() }
                 sink(s.isEmpty ? 0 : 1)
             }
         ))

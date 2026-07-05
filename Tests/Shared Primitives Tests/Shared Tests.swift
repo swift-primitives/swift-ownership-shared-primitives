@@ -41,7 +41,7 @@ private typealias SharedColumn<E: ~Copyable> = Shared<E, HeapColumn<E>>
 // Split on element copyability, mirroring `Shared`'s constructors: the Copyable form
 // resolves the clone-capturing init (CoW-capable); the move-only form resolves the
 // statically-unique init. A single `~Copyable`-generic helper would silently build
-// every column through the move-only constructor — `prepareForMutation`'s backstop
+// every column through the move-only constructor — `unshare`'s backstop
 // traps on the first shared mutation of such a column.
 private func makeShared<E>(capacity: UInt) -> SharedColumn<E> {
     SharedColumn<E>(HeapColumn<E>(minimumCapacity: Index<E>.Count(capacity)))
