@@ -11,7 +11,6 @@
 
 public import Buffer_Protocol_Primitives
 public import Store_Protocol_Primitives
-public import Index_Primitives
 public import Ownership_Box_Primitives
 
 /// The CoW column combinator — where conditional copyability enters the tower (the ratified
@@ -45,7 +44,7 @@ public import Ownership_Box_Primitives
 public struct Shared<
     Element: ~Copyable,
     B: Store.`Protocol` & Buffer.`Protocol` & ~Copyable
->: ~Copyable where B.Element == Element, B.Count == Index<Element>.Count {
+>: ~Copyable where B.Element == Element {
 
     /// The single refcounted backing (internal — the unchecked lane lives behind the
     /// CoW-checked surface).

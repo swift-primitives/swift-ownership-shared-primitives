@@ -65,9 +65,11 @@ extension Shared: Store.`Protocol` where Element: ~Copyable, B: ~Copyable {
 }
 
 extension Shared: Buffer.`Protocol` where Element: ~Copyable, B: ~Copyable {
-    public typealias Count = Index<Element>.Count
-
     /// The number of live elements (forwarded from the wrapped buffer's cursor).
+    ///
+    /// M7: `count` is the concrete `Index<Element>.Count`; the former
+    /// `typealias Count` witness for the deleted `Buffer.Protocol.Count`
+    /// associated type is gone.
     @inlinable
     public var count: Index<Element>.Count { box.unguarded.count }
 }
