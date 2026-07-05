@@ -1,7 +1,7 @@
-# ``Shared_Primitive``
+# ``Ownership_Shared_Primitive``
 
 @Metadata {
-    @DisplayName("Shared Primitive")
+    @DisplayName("Ownership Shared Primitive")
     @TitleHeading("Swift Primitives")
 }
 

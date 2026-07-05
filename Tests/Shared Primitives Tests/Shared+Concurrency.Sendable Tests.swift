@@ -1,4 +1,4 @@
-import Shared_Primitive
+import Ownership_Shared_Primitive
 import Buffer_Primitive
 import Buffer_Linear_Primitive
 import Buffer_Linear_Bounded_Primitive

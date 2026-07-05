@@ -1,11 +1,11 @@
-# Shared Primitives
+# Ownership Shared Primitives
 
 ![Development Status](https://img.shields.io/badge/status-active--development-blue.svg)
-[![CI](https://github.com/swift-primitives/swift-shared-primitives/actions/workflows/ci.yml/badge.svg)](https://github.com/swift-primitives/swift-shared-primitives/actions/workflows/ci.yml)
+[![CI](https://github.com/swift-primitives/swift-ownership-shared-primitives/actions/workflows/ci.yml/badge.svg)](https://github.com/swift-primitives/swift-ownership-shared-primitives/actions/workflows/ci.yml)
 
-`Shared<Element, B>` — the copy-on-write column. It wraps a backing column (`B: Store.Protocol & Buffer.Protocol`) in a single refcounted box and presents a **value-semantic** surface over it: copying a `Shared` shares the backing (no element copy), and the backing diverges **copy-on-write** only when a holder mutates while the box is shared. This is how a move-only (`~Copyable`) column becomes a freely-copyable value without giving up its zero-copy storage.
+`Ownership.Shared<Element, B>` — the copy-on-write column. It wraps a backing column (`B: Store.Protocol & Buffer.Protocol`) in a single refcounted box and presents a **value-semantic** surface over it: copying an `Ownership.Shared` shares the backing (no element copy), and the backing diverges **copy-on-write** only when a holder mutates while the box is shared. This is how a move-only (`~Copyable`) column becomes a freely-copyable value without giving up its zero-copy storage.
 
-The unchecked storage lane lives behind the CoW-checked surface; box identity is observable in tests (`_boxID`) so divergence can be asserted. `Shared` is `Copyable` when its element is, and `Sendable` when its backing is.
+The unchecked storage lane lives behind the CoW-checked surface; box identity is observable in tests (`_boxID`) so divergence can be asserted. `Ownership.Shared` is `Copyable` when its element is, and `Sendable` when its backing is.
 
 ---
 
@@ -21,10 +21,10 @@ The unchecked storage lane lives behind the CoW-checked surface; box identity is
 ## Quick Start
 
 ```swift
-import Shared_Primitive
+import Ownership_Shared_Primitive
 
-// `Shared` gives a move-only column value semantics:
-var a = Shared(/* backing column */)
+// `Ownership.Shared` gives a move-only column value semantics:
+var a = Ownership.Shared(/* backing column */)
 var b = a          // shares a's backing — no element copy
 b.mutate { … }     // copy-on-write: b diverges, a is untouched
 ```
@@ -37,7 +37,7 @@ Add the dependency to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/swift-primitives/swift-shared-primitives.git", branch: "main")
+    .package(url: "https://github.com/swift-primitives/swift-ownership-shared-primitives.git", branch: "main")
 ]
 ```
 
@@ -47,7 +47,7 @@ Add the product to your target:
 .target(
     name: "App",
     dependencies: [
-        .product(name: "Shared Primitive", package: "swift-shared-primitives")
+        .product(name: "Ownership Shared Primitive", package: "swift-ownership-shared-primitives")
     ]
 )
 ```
@@ -60,7 +60,7 @@ The package is pre-1.0 — depend on `branch: "main"` until `0.1.0` is tagged. R
 
 | Product | Contents | When to import |
 |---------|----------|----------------|
-| `Shared Primitive` | `Shared<Element, B>` — the copy-on-write column | Value-semantic sharing of a column |
+| `Ownership Shared Primitive` | `Ownership.Shared<Element, B>` — the copy-on-write column | Value-semantic sharing of a column |
 
 ---
 
@@ -78,9 +78,10 @@ The package is pre-1.0 — depend on `branch: "main"` until `0.1.0` is tagged. R
 
 ## Related Packages
 
-- [`swift-store-primitives`](https://github.com/swift-primitives/swift-store-primitives) — `Store.Protocol`, the column capability `Shared` wraps.
-- [`swift-buffer-primitives`](https://github.com/swift-primitives/swift-buffer-primitives) — `Buffer.Protocol`, the logical-count capability `Shared` requires.
-- [`swift-column-primitives`](https://github.com/swift-primitives/swift-column-primitives) — `Column`, the canonical backings a `Shared` is typically built over.
+- [`swift-store-primitives`](https://github.com/swift-primitives/swift-store-primitives) — `Store.Protocol`, the column capability `Ownership.Shared` wraps.
+- [`swift-buffer-primitives`](https://github.com/swift-primitives/swift-buffer-primitives) — `Buffer.Protocol`, the logical-count capability `Ownership.Shared` requires.
+- [`swift-ownership-primitives`](https://github.com/swift-primitives/swift-ownership-primitives) — `Ownership`, the namespace this column extends, and `Ownership.Box`, the refcounted cell it wraps.
+- [`swift-column-primitives`](https://github.com/swift-primitives/swift-column-primitives) — `Column`, the canonical backings an `Ownership.Shared` is typically built over.
 
 ---
 

@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "swift-shared-primitives",
+    name: "swift-ownership-shared-primitives",
     platforms: [
         .macOS(.v26),
         .iOS(.v26),
@@ -12,7 +12,7 @@ let package = Package(
         .visionOS(.v26),
     ],
     products: [
-        .library(name: "Shared Primitive", targets: ["Shared Primitive"])
+        .library(name: "Ownership Shared Primitive", targets: ["Ownership Shared Primitive"])
     ],
     dependencies: [
         .package(url: "https://github.com/swift-primitives/swift-buffer-primitives.git", branch: "main"),
@@ -31,7 +31,7 @@ let package = Package(
     targets: [
         // MARK: - The ratified W4 column combinator (PROPOSAL-tower-perfected-design §1.3, R-1/R-2)
         .target(
-            name: "Shared Primitive",
+            name: "Ownership Shared Primitive",
             dependencies: [
                 .product(name: "Buffer Primitive", package: "swift-buffer-primitives"),
                 .product(name: "Buffer Protocol Primitives", package: "swift-buffer-primitives"),
@@ -57,7 +57,7 @@ let package = Package(
         .testTarget(
             name: "Shared Primitives Tests",
             dependencies: [
-                "Shared Primitive",
+                "Ownership Shared Primitive",
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Bounded Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Ring Primitive", package: "swift-buffer-ring-primitives"),

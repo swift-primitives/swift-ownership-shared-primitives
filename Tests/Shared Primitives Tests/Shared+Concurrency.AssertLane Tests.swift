@@ -1,6 +1,6 @@
 #if DEBUG
 
-import Shared_Primitive
+import Ownership_Shared_Primitive
 import Buffer_Primitive
 import Buffer_Linear_Primitive
 import Storage_Contiguous_Primitives

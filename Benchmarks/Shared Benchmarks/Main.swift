@@ -9,14 +9,14 @@
 //
 // ===----------------------------------------------------------------------===//
 
-/// Gate-decomposition benchmark for swift-shared-primitives (arc-bench terminal).
+/// Gate-decomposition benchmark for swift-ownership-shared-primitives (arc-bench terminal).
 ///
 /// MEASUREMENT DISCIPLINE: `rm -rf .build`, build `-c release`, run the
 /// binary directly; never `swift test` (the W1-ratified instrument).
 @main
 enum Main {
     static func main() {
-        print("=== swift-shared-primitives — gate decomposition benchmark (terminal wave) ===")
+        print("=== swift-ownership-shared-primitives — gate decomposition benchmark (terminal wave) ===")
         print("config: sizes=\(Bench.sizes) samples=\(Bench.samples) warmup=\(Bench.warmup)")
         print("targets/sample: element=\(Bench.elementOpsTarget) structure=\(Bench.structureOpsTarget) copiedSlots=\(Bench.copiedSlotsTarget)")
         print("subjects: shared.unique=always-unique Ownership.Shared<Int,Linear> box · column.direct=bare Linear (unboxed control) · shared.sibling=detach rows; gated vs AssumingUnique pair-differences isolate the gate")

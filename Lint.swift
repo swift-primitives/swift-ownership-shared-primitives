@@ -1,9 +1,9 @@
 // swift-linter-tools-version: 0.1
 // ===----------------------------------------------------------------------===//
 //
-// This source file is part of the swift-shared-primitives open source project
+// This source file is part of the swift-ownership-shared-primitives open source project
 //
-// Copyright (c) 2026 Coen ten Thije Boonkkamp and the swift-shared-primitives project authors
+// Copyright (c) 2026 Coen ten Thije Boonkkamp and the swift-ownership-shared-primitives project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE for license information

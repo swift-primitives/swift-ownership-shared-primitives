@@ -26,7 +26,7 @@ let package = Package(
         .executableTarget(
             name: "Shared Benchmarks",
             dependencies: [
-                .product(name: "Shared Primitive", package: "swift-shared-primitives"),
+                .product(name: "Ownership Shared Primitive", package: "swift-ownership-shared-primitives"),
                 .product(name: "Buffer Linear Primitive", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Linear Primitives", package: "swift-buffer-linear-primitives"),
                 .product(name: "Buffer Primitive", package: "swift-buffer-primitives"),

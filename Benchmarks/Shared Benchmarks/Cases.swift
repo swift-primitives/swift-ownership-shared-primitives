@@ -9,7 +9,7 @@
 //
 // ===----------------------------------------------------------------------===//
 
-import Shared_Primitive
+import Ownership_Shared_Primitive
 import Buffer_Linear_Primitive
 import Buffer_Linear_Primitives
 import Buffer_Primitive
