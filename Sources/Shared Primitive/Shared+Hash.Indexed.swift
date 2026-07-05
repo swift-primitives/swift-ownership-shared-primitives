@@ -31,7 +31,7 @@ import Hash_Primitives
 // constructor pairs never touch element protocols inside their strategies, which is
 // why they carry no such bound — the asymmetry is the invariant, not an oversight.
 
-extension Shared where Element: ~Copyable, B: ~Copyable {
+extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// Wraps an ordered hashed column as a statically-unique (move-only element) column.
     @inlinable
     public init(_ column: consuming Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear>)
@@ -40,7 +40,7 @@ extension Shared where Element: ~Copyable, B: ~Copyable {
     }
 }
 
-extension Shared where Element: Copyable, B: ~Copyable {
+extension Ownership.Shared where Element: Copyable, B: ~Copyable {
     /// Wraps an ordered hashed column as a shared (CoW-capable) column.
     @inlinable
     public init(_ column: consuming Hash.Indexed<Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear>)

@@ -19,8 +19,8 @@ private typealias HeapStorage<E: ~Copyable> =
 private typealias GrowableRing<E: ~Copyable> = Buffer<HeapStorage<E>>.Ring
 private typealias BoundedRing<E: ~Copyable> = Buffer<HeapStorage<E>>.Ring.Bounded
 
-private typealias SharedRing<E: ~Copyable> = Shared<E, GrowableRing<E>>
-private typealias SharedBoundedRing<E: ~Copyable> = Shared<E, BoundedRing<E>>
+private typealias SharedRing<E: ~Copyable> = Ownership.Shared<E, GrowableRing<E>>
+private typealias SharedBoundedRing<E: ~Copyable> = Ownership.Shared<E, BoundedRing<E>>
 
 // MARK: - [DS-024]: the boxed ring columns are lawful
 

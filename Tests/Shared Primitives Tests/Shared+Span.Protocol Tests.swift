@@ -17,7 +17,7 @@ private typealias HeapStorage<E: ~Copyable> =
     Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>
 
 private typealias HeapColumn<E: ~Copyable> = Buffer<HeapStorage<E>>.Linear
-private typealias SharedColumn<E: ~Copyable> = Shared<E, HeapColumn<E>>
+private typealias SharedColumn<E: ~Copyable> = Ownership.Shared<E, HeapColumn<E>>
 
 /// Generic Span.Protocol-bound walk — the lattice dispatch shape.
 private func total<S: Span.`Protocol`>(_ s: borrowing S) -> Int where S.Element == Int {

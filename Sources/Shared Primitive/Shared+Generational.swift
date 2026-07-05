@@ -23,7 +23,7 @@ public import Ownership_Box_Primitives
 // deep copy (sibling handles survive a CoW detach); the drain is the store's own
 // removeAll() (R-5, [MEM-SAFE-028]).
 
-extension Shared where Element: ~Copyable, B: ~Copyable {
+extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// Wraps a generational (slot-map) store as a statically-unique (move-only element)
     /// column.
     @inlinable
@@ -33,7 +33,7 @@ extension Shared where Element: ~Copyable, B: ~Copyable {
     }
 }
 
-extension Shared where Element: Copyable, B: ~Copyable {
+extension Ownership.Shared where Element: Copyable, B: ~Copyable {
     /// Wraps a generational (slot-map) store as a shared (CoW-capable) column.
     @inlinable
     public init(_ store: consuming Storage<Memory.Allocator<Memory.Heap>.Pool>.Generational<Element>)
@@ -63,7 +63,7 @@ extension Shared where Element: Copyable, B: ~Copyable {
 // restore on `Copyable`-element columns; after the first restore in a batch the box IS unique, so
 // every later branch is clone-free. Reads stay free.
 
-extension Shared where Element: ~Copyable, B: ~Copyable {
+extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// Inserts an element into the wrapped slot-map; returns a fresh handle to its slot.
     @inlinable
     public mutating func insert(_ element: consuming Element) -> Store.Generational.Handle

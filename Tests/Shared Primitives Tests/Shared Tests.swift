@@ -36,7 +36,7 @@ private enum Probe {
 private typealias HeapColumn<E: ~Copyable> =
     Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear
 
-private typealias SharedColumn<E: ~Copyable> = Shared<E, HeapColumn<E>>
+private typealias SharedColumn<E: ~Copyable> = Ownership.Shared<E, HeapColumn<E>>
 
 // Split on element copyability, mirroring `Shared`'s constructors: the Copyable form
 // resolves the clone-capturing init (CoW-capable); the move-only form resolves the

@@ -19,7 +19,7 @@ private typealias HeapStorage<E: ~Copyable> =
 
 private typealias BoundedLinear<E: ~Copyable> = Buffer<HeapStorage<E>>.Linear.Bounded
 
-private typealias SharedBoundedLinear<E: ~Copyable> = Shared<E, BoundedLinear<E>>
+private typealias SharedBoundedLinear<E: ~Copyable> = Ownership.Shared<E, BoundedLinear<E>>
 
 // MARK: - [DS-024]: the boxed bounded-linear column is lawful
 

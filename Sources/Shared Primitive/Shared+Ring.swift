@@ -25,7 +25,7 @@ public import Ownership_Box_Primitives
 // captures none (statically unique). Drains are the columns' own teardown ops; the box's
 // class deinit owns element teardown (R-5, [MEM-SAFE-028]).
 
-extension Shared where Element: ~Copyable, B: ~Copyable {
+extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// Wraps a growable heap-ring buffer as a statically-unique (move-only element) column.
     @inlinable
     public init(_ buffer: consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring)
@@ -41,7 +41,7 @@ extension Shared where Element: ~Copyable, B: ~Copyable {
     }
 }
 
-extension Shared where Element: Copyable, B: ~Copyable {
+extension Ownership.Shared where Element: Copyable, B: ~Copyable {
     /// Wraps a growable heap-ring buffer as a shared (CoW-capable) column.
     @inlinable
     public init(_ buffer: consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring)

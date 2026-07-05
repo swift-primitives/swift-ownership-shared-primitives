@@ -28,7 +28,7 @@ public import Ownership_Box_Primitives
 // (statically unique). The drain is the column's own `remove.all()`; the box's
 // class deinit owns element teardown (R-5, [MEM-SAFE-028]).
 
-extension Shared where Element: ~Copyable, B: ~Copyable {
+extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// Wraps a bounded heap-linear buffer as a statically-unique (move-only element) column.
     @inlinable
     public init(_ buffer: consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear.Bounded)
@@ -37,7 +37,7 @@ extension Shared where Element: ~Copyable, B: ~Copyable {
     }
 }
 
-extension Shared where Element: Copyable, B: ~Copyable {
+extension Ownership.Shared where Element: Copyable, B: ~Copyable {
     /// Wraps a bounded heap-linear buffer as a shared (CoW-capable) column.
     @inlinable
     public init(_ buffer: consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear.Bounded)

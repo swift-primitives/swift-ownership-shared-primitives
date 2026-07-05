@@ -24,7 +24,7 @@ public import Ownership_Box_Primitives
 // `Element: Copyable` — so uniqueness never needs restoring). At `Copyable` construction
 // sites the more-constrained overload wins.
 
-extension Shared where Element: ~Copyable, B: ~Copyable {
+extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// Wraps a dense heap-linear buffer as a statically-unique (move-only element) column.
     @inlinable
     public init(_ buffer: consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear)
@@ -33,7 +33,7 @@ extension Shared where Element: ~Copyable, B: ~Copyable {
     }
 }
 
-extension Shared where Element: Copyable, B: ~Copyable {
+extension Ownership.Shared where Element: Copyable, B: ~Copyable {
     /// Wraps a dense heap-linear buffer as a shared (CoW-capable) column.
     @inlinable
     public init(_ buffer: consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear)
@@ -48,7 +48,7 @@ extension Shared where Element: Copyable, B: ~Copyable {
 
 // MARK: - Uniqueness
 
-extension Shared where Element: Copyable, B: ~Copyable {
+extension Ownership.Shared where Element: Copyable, B: ~Copyable {
     /// Whether this value holds the only reference to its backing box.
     @inlinable
     public var isUnique: Bool {
@@ -56,7 +56,7 @@ extension Shared where Element: Copyable, B: ~Copyable {
     }
 }
 
-extension Shared where Element: ~Copyable, B: ~Copyable {
+extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// Ensures this value uniquely owns its backing, installing a deep copy of the live
     /// elements when the box is shared — the CoW restore, placed at the SEMANTIC boundary
     /// (every public mutation of a shared column runs through here FIRST; the seam beneath
@@ -80,7 +80,7 @@ extension Shared where Element: ~Copyable, B: ~Copyable {
 
 // MARK: - The CoW-checked mutation surface (heap-linear column)
 
-extension Shared where Element: ~Copyable, B: ~Copyable {
+extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// Appends an element (grows as needed). CoW-checked for Copyable elements.
     @inlinable
     public mutating func append(_ element: consuming Element)

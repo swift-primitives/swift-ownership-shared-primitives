@@ -21,7 +21,7 @@ import Affine_Primitives_Standard_Library_Integration
 // `[0, count)` through the seam (the linear-family contract; wrapped/sparse disciplines get
 // their carriers with their own ADT columns).
 
-extension Shared: Equatable where Element: Equatable, B: ~Copyable {
+extension Ownership.Shared: Equatable where Element: Equatable, B: ~Copyable {
     @inlinable
     public static func == (lhs: Self, rhs: Self) -> Bool {
         guard lhs.count == rhs.count else { return false }

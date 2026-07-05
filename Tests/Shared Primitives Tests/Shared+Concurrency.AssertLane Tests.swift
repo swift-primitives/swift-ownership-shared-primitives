@@ -30,7 +30,7 @@ import Testing
 
 private typealias HeapColumn<E: ~Copyable> =
     Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear
-private typealias SharedColumn<E: ~Copyable> = Shared<E, HeapColumn<E>>
+private typealias SharedColumn<E: ~Copyable> = Ownership.Shared<E, HeapColumn<E>>
 
 private func makeShared<E>(capacity: UInt) -> SharedColumn<E> {
     SharedColumn<E>(HeapColumn<E>(minimumCapacity: Index<E>.Count(capacity)))

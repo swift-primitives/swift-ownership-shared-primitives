@@ -23,7 +23,7 @@ public import Ownership_Box_Primitives
 // SCOPED/yielding forms. The mutable form restores uniqueness FIRST (the stdlib
 // `_makeMutableAndUnique()` order — a mutable view over a shared box would alias).
 
-extension Shared where Element: ~Copyable, B: ~Copyable {
+extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// Calls `body` with a read-only span over the live elements.
     @inlinable
     public func withSpan<R, Failure: Swift.Error>(

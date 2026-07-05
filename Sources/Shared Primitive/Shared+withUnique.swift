@@ -23,7 +23,7 @@ public import Ownership_Box_Primitives
 // ```swift
 // extension Queue where S: ~Copyable {
 //     public mutating func pushFront<E>(_ element: consuming E)
-//     where S == Shared<E, Buffer<…>.Ring> {
+//     where S == Ownership.Shared<E, Buffer<…>.Ring> {
 //         store.withUnique(consuming: element) { ring, element in
 //             ring.pushFront(element)
 //         }
@@ -31,7 +31,7 @@ public import Ownership_Box_Primitives
 // }
 // ```
 
-extension Shared where Element: ~Copyable, B: ~Copyable {
+extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// Scoped MUTABLE access to the uniquely-owned column: restores uniqueness FIRST
     /// (the gate — siblings sharing the box are detached before the closure sees the
     /// buffer), then yields the wrapped buffer.

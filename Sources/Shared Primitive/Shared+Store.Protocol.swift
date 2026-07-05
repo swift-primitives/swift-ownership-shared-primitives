@@ -26,7 +26,7 @@ public import Ownership_Box_Primitives
 // The explicit `…AssumingUnique` spellings (`Shared+Unique.swift`) remain the ONLY unchecked
 // mutation lane, for proven-hot batches whose uniqueness the caller has already established.
 
-extension Shared: Store.`Protocol` where Element: ~Copyable, B: ~Copyable {
+extension Ownership.Shared: Store.`Protocol` where Element: ~Copyable, B: ~Copyable {
     @inlinable
     public var capacity: Index<Element>.Count { box.unguarded.capacity }
 
@@ -64,7 +64,7 @@ extension Shared: Store.`Protocol` where Element: ~Copyable, B: ~Copyable {
     }
 }
 
-extension Shared: Buffer.`Protocol` where Element: ~Copyable, B: ~Copyable {
+extension Ownership.Shared: Buffer.`Protocol` where Element: ~Copyable, B: ~Copyable {
     /// The number of live elements (forwarded from the wrapped buffer's cursor).
     ///
     /// M7: `count` is the concrete `Index<Element>.Count`; the former

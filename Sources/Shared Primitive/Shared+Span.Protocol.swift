@@ -16,7 +16,7 @@ public import Ownership_Box_Primitives
 //
 // The recorded future-work item, ruled + spike-proven at W1-4 (2026-06-11;
 // .handoffs/probes-2026-06-11/shared-span-spike/ — 4 probes, debug AND release).
-// This is what admits `Array<Shared<E, B>>` (and every Shared-column ADT) to the
+// This is what admits `Array<Ownership.Shared<E, B>>` (and every Shared-column ADT) to the
 // span-bridged Collection lattice: `Array: Collection.Protocol where S: Span.Protocol`
 // chains automatically once Shared itself conforms.
 //
@@ -48,7 +48,7 @@ public import Ownership_Box_Primitives
 // The empty window uses a dangling-aligned non-nil base with count 0 (never
 // dereferenced — the stdlib slice idiom).
 
-extension Shared where Element: ~Copyable, B: ~Copyable {
+extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// Forms the inner span against a borrowed PARAMETER (not the class-property
     /// access) and extracts the raw window closure-scoped — the dependence chain
     /// stays inside this call frame.
@@ -62,7 +62,7 @@ extension Shared where Element: ~Copyable, B: ~Copyable {
     }
 }
 
-extension Shared: Span.`Protocol` where B: Span.`Protocol`, B: ~Copyable {
+extension Ownership.Shared: Span.`Protocol` where B: Span.`Protocol`, B: ~Copyable {
     /// A read-only contiguous view of the boxed column's elements, borrowing `self`.
     ///
     /// See the file-header Safety Invariant for the laundering soundness argument.

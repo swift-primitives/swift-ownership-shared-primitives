@@ -15,7 +15,7 @@ import Affine_Primitives_Standard_Library_Integration
 
 // Element-keyed carrier — see `Shared+Equatable.swift` for the re-materialization note.
 
-extension Shared: Hashable where Element: Hashable, B: ~Copyable {
+extension Ownership.Shared: Hashable where Element: Hashable, B: ~Copyable {
     @inlinable
     public func hash(into hasher: inout Hasher) {
         hasher.combine(Int(bitPattern: count.underlying.rawValue))

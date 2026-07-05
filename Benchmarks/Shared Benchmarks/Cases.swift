@@ -33,7 +33,7 @@ import Cardinal_Primitives
 typealias LinearColumn =
     Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Int>>.Linear
 
-typealias SharedColumn = Shared<Int, LinearColumn>
+typealias SharedColumn = Ownership.Shared<Int, LinearColumn>
 
 extension Bench {
     /// Typed count from a runtime size via the non-throwing `UInt` lane.

@@ -20,7 +20,7 @@ public import Ownership_Box_Primitives
 /// the ELEMENT is copyable: copies share the box until the first mutation restores uniqueness
 /// (`ensureUnique()`); `~Copyable`-element instantiations are move-only and statically unique
 /// (no CoW surface exists for them at all). Copyability flows from the COLUMN:
-/// `Array<Shared<E, …Linear>>` is the value-semantic column, `Array<…Linear>` stays the
+/// `Array<Ownership.Shared<E, …Linear>>` is the value-semantic column, `Array<…Linear>` stays the
 /// zero-cost move-only column.
 ///
 /// ## The SE-0427-forced spelling
@@ -40,25 +40,27 @@ public import Ownership_Box_Primitives
 /// down an EMPTY buffer (correct whether or not it runs) and the `-O` devirtualized-destroy
 /// deinit-omission miscompile for generic-namespace-nested `~Copyable` columns is dodged (durable
 /// repro: `swift-institute/Experiments/cow-box-deinit-omission-miscompile`).
-@frozen
-public struct Shared<
-    Element: ~Copyable,
-    B: Store.`Protocol` & Buffer.`Protocol` & ~Copyable
->: ~Copyable where B.Element == Element {
+extension Ownership {
+    @frozen
+    public struct Shared<
+        Element: ~Copyable,
+        B: Store.`Protocol` & Buffer.`Protocol` & ~Copyable
+    >: ~Copyable where B.Element == Element {
 
-    /// The single refcounted backing (internal — the unchecked lane lives behind the
-    /// CoW-checked surface).
-    @usableFromInline
-    internal var box: Ownership.Box<B>
+        /// The single refcounted backing (internal — the unchecked lane lives behind the
+        /// CoW-checked surface).
+        @usableFromInline
+        internal var box: Ownership.Box<B>
 
-    @usableFromInline
-    internal init(box: consuming Ownership.Box<B>) {
-        self.box = box
+        @usableFromInline
+        internal init(box: consuming Ownership.Box<B>) {
+            self.box = box
+        }
+
+        /// Identity of the current backing box — CoW divergence is observable here (test window).
+        @usableFromInline
+        package var _boxID: ObjectIdentifier { box.identity }
     }
-
-    /// Identity of the current backing box — CoW divergence is observable here (test window).
-    @usableFromInline
-    package var _boxID: ObjectIdentifier { box.identity }
 }
 
 // MARK: - Conditional Conformances (co-located per [COPY-FIX-004])
@@ -67,7 +69,7 @@ public struct Shared<
 /// reference — always Copyable-layout — and the struct carries no deinit, so SE-0427 is
 /// satisfied; `B` stays explicitly `~Copyable` as the diagnostic demands). For `~Copyable`
 /// elements no clone path exists, so the instantiation is move-only by construction.
-extension Shared: Copyable where Element: Copyable, B: ~Copyable {}
+extension Ownership.Shared: Copyable where Element: Copyable, B: ~Copyable {}
 
 /// Sendable via the CoW discipline: every PUBLIC mutation path — the semantic surface
 /// (`Shared+Unique.swift`) AND the seam's own mutators (`Shared+Store.Protocol.swift`, which
@@ -75,4 +77,4 @@ extension Shared: Copyable where Element: Copyable, B: ~Copyable {}
 /// shared. The sole exception is the explicit `…AssumingUnique` spellings, whose names state
 /// the obligation the caller assumes; misusing one on a shared box is the documented unchecked
 /// lane, not the default path.
-extension Shared: Sendable where Element: ~Copyable, B: Sendable & ~Copyable {}
+extension Ownership.Shared: Sendable where Element: ~Copyable, B: Sendable & ~Copyable {}

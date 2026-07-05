@@ -19,7 +19,7 @@ enum Main {
         print("=== swift-shared-primitives — gate decomposition benchmark (terminal wave) ===")
         print("config: sizes=\(Bench.sizes) samples=\(Bench.samples) warmup=\(Bench.warmup)")
         print("targets/sample: element=\(Bench.elementOpsTarget) structure=\(Bench.structureOpsTarget) copiedSlots=\(Bench.copiedSlotsTarget)")
-        print("subjects: shared.unique=always-unique Shared<Int,Linear> box · column.direct=bare Linear (unboxed control) · shared.sibling=detach rows; gated vs AssumingUnique pair-differences isolate the gate")
+        print("subjects: shared.unique=always-unique Ownership.Shared<Int,Linear> box · column.direct=bare Linear (unboxed control) · shared.sibling=detach rows; gated vs AssumingUnique pair-differences isolate the gate")
         print("")
         Bench.globalWarmup()
 
