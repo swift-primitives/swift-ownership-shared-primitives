@@ -9,12 +9,12 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Buffer_Primitive
 public import Buffer_Linear_Primitive
-public import Storage_Contiguous_Primitives
-public import Memory_Heap_Primitives
+public import Buffer_Primitive
 public import Memory_Allocator_Primitive
+public import Memory_Heap_Primitives
 public import Ownership_Box_Primitives
+public import Storage_Contiguous_Primitives
 
 // MARK: - Construction (pinned per column; drain + clone strategies are supplied here)
 //
@@ -38,11 +38,13 @@ extension Ownership.Shared where Element: Copyable, B: ~Copyable {
     @inlinable
     public init(_ buffer: consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear)
     where B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear {
-        self.init(box: Ownership.Box(
-            buffer,
-            drain: { $0.removeAll(keepingCapacity: true) },
-            clone: { $0.clone() }
-        ))
+        self.init(
+            box: Ownership.Box(
+                buffer,
+                drain: { $0.removeAll(keepingCapacity: true) },
+                clone: { $0.clone() }
+            )
+        )
     }
 }
 
@@ -81,7 +83,9 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
 // MARK: - The CoW-checked mutation surface (heap-linear column)
 
 extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
-    /// Appends an element (grows as needed). CoW-checked for Copyable elements.
+    /// Appends an element (grows as needed).
+    ///
+    /// CoW-checked for Copyable elements.
     @inlinable
     public mutating func append(_ element: consuming Element)
     where B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear, Element: Copyable {
@@ -102,7 +106,9 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
         box.unguarded.append(element)
     }
 
-    /// Removes and returns the last element. CoW-checked for Copyable elements.
+    /// Removes and returns the last element.
+    ///
+    /// CoW-checked for Copyable elements.
     @inlinable
     public mutating func removeLast()
         -> Element
@@ -112,6 +118,7 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     }
 
     /// Removes and returns the last element on the statically-unique column.
+    ///
     /// Debug builds assert uniqueness (see `appendAssumingUnique`).
     @inlinable
     public mutating func removeLastAssumingUnique()

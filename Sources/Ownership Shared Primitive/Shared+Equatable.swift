@@ -9,9 +9,9 @@
 //
 // ===----------------------------------------------------------------------===//
 
+import Affine_Primitives_Standard_Library_Integration
 public import Index_Primitives
 import Ordinal_Primitives_Standard_Library_Integration
-import Affine_Primitives_Standard_Library_Integration
 
 // MARK: - Element-keyed semantics (the W4 re-materialization)
 //
@@ -22,6 +22,7 @@ import Affine_Primitives_Standard_Library_Integration
 // their carriers with their own ADT columns).
 
 extension Ownership.Shared: Equatable where Element: Equatable, B: ~Copyable {
+    /// Compares the live prefix `[0, count)` of both columns element-wise.
     @inlinable
     public static func == (lhs: Self, rhs: Self) -> Bool {
         guard lhs.count == rhs.count else { return false }

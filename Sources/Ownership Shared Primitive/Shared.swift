@@ -10,8 +10,8 @@
 // ===----------------------------------------------------------------------===//
 
 public import Buffer_Protocol_Primitives
-public import Store_Protocol_Primitives
 public import Ownership_Box_Primitives
+public import Store_Protocol_Primitives
 
 /// The CoW column combinator — where conditional copyability enters the tower (the ratified
 /// W4 design, `PROPOSAL-tower-perfected-design.md` §1.3 / R-1 / R-2).
@@ -41,6 +41,11 @@ public import Ownership_Box_Primitives
 /// deinit-omission miscompile for generic-namespace-nested `~Copyable` columns is dodged (durable
 /// repro: `swift-institute/Experiments/cow-box-deinit-omission-miscompile`).
 extension Ownership {
+    /// A refcounted, copy-on-write column combinator over a move-only buffer `B`.
+    ///
+    /// `Copyable` exactly when `Element` is; `~Copyable`-element instantiations
+    /// are move-only and statically unique. See the extension-level documentation
+    /// above for the full CoW/teardown design.
     @frozen
     public struct Shared<
         Element: ~Copyable,

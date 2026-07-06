@@ -9,12 +9,12 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Buffer_Primitive
 public import Buffer_Linear_Primitive
-public import Storage_Contiguous_Primitives
-public import Memory_Heap_Primitives
+public import Buffer_Primitive
 public import Memory_Allocator_Primitive
+public import Memory_Heap_Primitives
 public import Ownership_Box_Primitives
+public import Storage_Contiguous_Primitives
 
 // MARK: - Span surface (scoped at the class hop)
 //
@@ -33,7 +33,9 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
         try Self._withSpan(box.unguarded, body)
     }
 
-    /// Calls `body` with a mutable span over the live elements. CoW-checked FIRST for
+    /// Calls `body` with a mutable span over the live elements.
+    ///
+    /// CoW-checked FIRST for
     /// Copyable elements (uniqueness is restored before any mutable view exists).
     @inlinable
     public mutating func withMutableSpan<R, Failure: Swift.Error>(
@@ -45,6 +47,7 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     }
 
     /// Mutable span on the statically-unique (~Copyable-element) column.
+    ///
     /// Debug builds assert uniqueness (see `appendAssumingUnique`).
     @inlinable
     public mutating func withMutableSpanAssumingUnique<R, Failure: Swift.Error>(

@@ -9,10 +9,10 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Store_Protocol_Primitives
 public import Buffer_Protocol_Primitives
 public import Index_Primitives
 public import Ownership_Box_Primitives
+public import Store_Protocol_Primitives
 
 // MARK: - The seam (SELF-GATING mutators) + the count surface
 //
@@ -27,9 +27,11 @@ public import Ownership_Box_Primitives
 // mutation lane, for proven-hot batches whose uniqueness the caller has already established.
 
 extension Ownership.Shared: Store.`Protocol` where Element: ~Copyable, B: ~Copyable {
+    /// The wrapped buffer's total slot capacity (forwarded, read-only — capacity changes flow through construction, not this seam).
     @inlinable
     public var capacity: Index<Element>.Count { box.unguarded.capacity }
 
+    /// Element access by slot; the setter path restores uniqueness before yielding a mutable reference.
     @inlinable
     public subscript(slot: Index<Element>) -> Element {
         _read { yield box.unguarded[slot] }
@@ -39,12 +41,14 @@ extension Ownership.Shared: Store.`Protocol` where Element: ~Copyable, B: ~Copya
         }
     }
 
+    /// Initializes the given slot with `element`, restoring uniqueness first.
     @inlinable
     public mutating func initialize(at slot: Index<Element>, to element: consuming Element) {
         ensureUnique()
         box.unguarded.initialize(at: slot, to: element)
     }
 
+    /// Moves the element out of the given slot, restoring uniqueness first.
     @inlinable
     public mutating func move(at slot: Index<Element>) -> Element {
         ensureUnique()

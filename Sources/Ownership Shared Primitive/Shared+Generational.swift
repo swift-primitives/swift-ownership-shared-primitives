@@ -9,13 +9,13 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Storage_Primitive
-public import Storage_Generational_Primitives
-public import Store_Primitive
-public import Memory_Heap_Primitives
-public import Memory_Allocator_Primitive
 public import Index_Primitives
+public import Memory_Allocator_Primitive
+public import Memory_Heap_Primitives
 public import Ownership_Box_Primitives
+public import Storage_Generational_Primitives
+public import Storage_Primitive
+public import Store_Primitive
 
 // MARK: - Construction, pinned for the GENERATIONAL column ([MEM-COPY-017] split)
 //
@@ -38,11 +38,13 @@ extension Ownership.Shared where Element: Copyable, B: ~Copyable {
     @inlinable
     public init(_ store: consuming Storage<Memory.Allocator<Memory.Heap>.Pool>.Generational<Element>)
     where B == Storage<Memory.Allocator<Memory.Heap>.Pool>.Generational<Element> {
-        self.init(box: Ownership.Box(
-            store,
-            drain: { $0.removeAll() },
-            clone: { $0.clone() }
-        ))
+        self.init(
+            box: Ownership.Box(
+                store,
+                drain: { $0.removeAll() },
+                clone: { $0.clone() }
+            )
+        )
     }
 }
 
@@ -101,7 +103,9 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     }
 
     /// Grows the wrapped slot universe to `slotCapacity`, preserving handles index-aligned
-    /// (outstanding handles keep resolving). CoW-checked: uniqueness restored FIRST.
+    /// (outstanding handles keep resolving).
+    ///
+    /// CoW-checked: uniqueness restored FIRST.
     ///
     /// The growth pin for the linked family's `Shared` column; the move-based generation-
     /// preserving relocation lives in the store (`Storage.Generational.grow(to:)`).
