@@ -1,11 +1,11 @@
-import Ownership_Shared_Primitive
-import Buffer_Primitive
-import Buffer_Linear_Primitive
 import Buffer_Linear_Bounded_Primitive
-import Storage_Contiguous_Primitives
-import Memory_Heap_Primitives
-import Memory_Allocator_Primitive
+import Buffer_Linear_Primitive
+import Buffer_Primitive
 import Index_Primitives
+import Memory_Allocator_Primitive
+import Memory_Heap_Primitives
+import Ownership_Shared_Primitive
+import Storage_Contiguous_Primitives
 import Testing
 
 // W2 adversarial suite 5 — SENDABLE SURFACE AS CODE (GOAL-tower-arc-shared-soundness

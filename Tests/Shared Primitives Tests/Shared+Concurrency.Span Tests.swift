@@ -1,10 +1,10 @@
-import Ownership_Shared_Primitive
-import Buffer_Primitive
 import Buffer_Linear_Primitive
-import Storage_Contiguous_Primitives
-import Memory_Heap_Primitives
-import Memory_Allocator_Primitive
+import Buffer_Primitive
 import Index_Primitives
+import Memory_Allocator_Primitive
+import Memory_Heap_Primitives
+import Ownership_Shared_Primitive
+import Storage_Contiguous_Primitives
 import Synchronization
 import Testing
 
@@ -72,17 +72,17 @@ struct SharedConcurrencySpanWindowTests {
             for t in 0..<width {
                 group.addTask {
                     var mine = frozen
-                    let before = mine.withSpan { span in     // borrow ends at return…
+                    let before = mine.withSpan { span in  // borrow ends at return…
                         var acc = 0
                         for i in 0..<span.count { acc &+= span[i] }
                         return acc
                     }
                     let sharedBefore = (mine._boxID == frozen._boxID)
-                    mine.withUnique { column in              // …then the gate detaches
+                    mine.withUnique { column in  // …then the gate detaches
                         column.append(40 &+ t)
                     }
                     let diverged = (mine._boxID != frozen._boxID)
-                    let after = mine.withSpan { span in      // fresh borrow on the new box
+                    let after = mine.withSpan { span in  // fresh borrow on the new box
                         var acc = 0
                         for i in 0..<span.count { acc &+= span[i] }
                         return acc
@@ -129,7 +129,7 @@ struct SharedConcurrencySpanWindowTests {
         #expect(outcomes.count == 12)
         #expect(outcomes.allSatisfy { $0 })
         let sourceUntouched = (proto._boxID == frozen._boxID)
-        #expect(sourceUntouched)                             // reads NEVER detached anything
+        #expect(sourceUntouched)  // reads NEVER detached anything
     }
 
     @Test(arguments: [4, 12])
@@ -173,7 +173,7 @@ struct SharedConcurrencyMoveOnlyTests {
                     var column: SharedColumn<Item> = makeSharedMoveOnly(capacity: 8)
                     column.appendAssumingUnique(Item(t &* 10))
                     column.appendAssumingUnique(Item(t &* 10 &+ 1))
-                    column.withUnique { buffer in            // the gate is the lawful no-op here
+                    column.withUnique { buffer in  // the gate is the lawful no-op here
                         buffer.append(Item(t &* 10 &+ 2))
                     }
                     let took = column.removeLastAssumingUnique()
@@ -181,7 +181,7 @@ struct SharedConcurrencyMoveOnlyTests {
                     _ = consume took
                     let n = column.count
                     return tookID == t &* 10 &+ 2 && n == Index<Item>.Count(2)
-                }                                            // column dies in-task: box drains here
+                }  // column dies in-task: box drains here
             }
             var out: [Bool] = []
             for await ok in group { out.append(ok) }

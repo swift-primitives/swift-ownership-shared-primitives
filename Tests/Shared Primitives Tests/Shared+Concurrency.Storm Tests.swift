@@ -1,10 +1,10 @@
-import Ownership_Shared_Primitive
-import Buffer_Primitive
 import Buffer_Linear_Primitive
-import Storage_Contiguous_Primitives
-import Memory_Heap_Primitives
-import Memory_Allocator_Primitive
+import Buffer_Primitive
 import Index_Primitives
+import Memory_Allocator_Primitive
+import Memory_Heap_Primitives
+import Ownership_Shared_Primitive
+import Storage_Contiguous_Primitives
 import Synchronization
 import Testing
 
@@ -57,7 +57,7 @@ struct SharedConcurrencyStormTests {
         let frozen = proto
         let outcomes = await withTaskGroup(of: Bool.self, returning: [Bool].self) { group in
             for _ in 0..<8 {
-                group.addTask {                              // reader: never mutates its sibling
+                group.addTask {  // reader: never mutates its sibling
                     let mine = frozen
                     var good = true
                     for _ in 0..<250 {
@@ -71,7 +71,7 @@ struct SharedConcurrencyStormTests {
                 }
             }
             for t in 0..<8 {
-                group.addTask {                              // writer: detaches, then churns
+                group.addTask {  // writer: detaches, then churns
                     var mine = frozen
                     for k in 0..<99 {
                         mine.append(t &* 1000 &+ k)
@@ -167,7 +167,7 @@ struct SharedConcurrencyStormTeardownTests {
                 // closure over a class-element span crashes the 6.3.2 -O pipeline —
                 // see probes-2026-06-11/tsan-spike/w2-release-wall/).
                 for _ in 0..<6 {
-                    group.addTask {                          // readers borrow the shared box
+                    group.addTask {  // readers borrow the shared box
                         let mine = frozen
                         var good = true
                         for _ in 0..<150 {
@@ -183,7 +183,7 @@ struct SharedConcurrencyStormTeardownTests {
                     }
                 }
                 for t in 0..<6 {
-                    group.addTask {                          // writers detach + replace refs
+                    group.addTask {  // writers detach + replace refs
                         var mine = frozen
                         for k in 0..<20 {
                             mine.append(Payload(t &* 100 &+ k))

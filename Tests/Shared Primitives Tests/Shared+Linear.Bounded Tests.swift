@@ -1,12 +1,12 @@
-import Ownership_Shared_Primitive
-import Buffer_Primitive
-import Buffer_Linear_Primitive
 import Buffer_Linear_Bounded_Primitive
+import Buffer_Linear_Primitive
+import Buffer_Primitive
 import Buffer_Primitives_Test_Support
-import Storage_Contiguous_Primitives
-import Memory_Heap_Primitives
-import Memory_Allocator_Primitive
 import Index_Primitives
+import Memory_Allocator_Primitive
+import Memory_Heap_Primitives
+import Ownership_Shared_Primitive
+import Storage_Contiguous_Primitives
 import Testing
 
 // The bounded-linear CoW column (ASK-W1-1, principal-ruled 2026-06-11): the pinned
@@ -50,11 +50,12 @@ struct SharedLinearBoundedCoWTests {
         let t = s
         let sharedBefore = (s._boxID == t._boxID)
         #expect(sharedBefore)
-        s[0] = 100                              // self-gating _modify clones first
+        s[0] = 100  // self-gating _modify clones first
         let diverged = (s._boxID != t._boxID)
         #expect(diverged)
-        #expect(s.capacity == capacityBefore)   // the capacity-preserving clone
-        let mine = s[0], theirs = t[0]
+        #expect(s.capacity == capacityBefore)  // the capacity-preserving clone
+        let mine = s[0]
+        let theirs = t[0]
         #expect(mine == 100)
         #expect(theirs == 1)
     }

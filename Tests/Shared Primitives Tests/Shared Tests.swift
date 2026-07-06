@@ -1,10 +1,10 @@
-import Ownership_Shared_Primitive
-import Buffer_Primitive
 import Buffer_Linear_Primitive
-import Storage_Contiguous_Primitives
-import Memory_Heap_Primitives
-import Memory_Allocator_Primitive
+import Buffer_Primitive
 import Index_Primitives
+import Memory_Allocator_Primitive
+import Memory_Heap_Primitives
+import Ownership_Shared_Primitive
+import Storage_Contiguous_Primitives
 import Testing
 
 // MARK: - Fixtures
@@ -13,7 +13,10 @@ import Testing
 private struct Item: ~Copyable {
     let id: Int
     var value: Int
-    init(_ id: Int, value: Int = 0) { self.id = id; self.value = value }
+    init(_ id: Int, value: Int = 0) {
+        self.id = id
+        self.value = value
+    }
     deinit { Probe.recordDestroy(id) }
 }
 
@@ -63,13 +66,14 @@ struct SharedTests {
         a.append(Payload(1))
         a.append(Payload(2))
         let idBefore = a._boxID
-        let b = a                                   // Copyable fires (Element is a class)
+        let b = a  // Copyable fires (Element is a class)
         let sharedAfterCopy = (b._boxID == idBefore)
-        #expect(sharedAfterCopy)                    // copy shares — no eager clone
-        a.append(Payload(3))                        // first mutation → CoW restore
+        #expect(sharedAfterCopy)  // copy shares — no eager clone
+        a.append(Payload(3))  // first mutation → CoW restore
         let diverged = (a._boxID != b._boxID)
         #expect(diverged)
-        let aCount = a.count, bCount = b.count
+        let aCount = a.count
+        let bCount = b.count
         #expect(aCount == Index<Payload>.Count(3))
         #expect(bCount == Index<Payload>.Count(2))  // the copy is untouched
         let b0 = b[.zero].id
@@ -99,7 +103,7 @@ struct SharedTests {
             let b = a
             let bCount = b.count
             #expect(bCount == Index<Payload>.Count(2))
-        }                                           // one box → one drain
+        }  // one box → one drain
         let ds = Probe.destroyedSorted
         #expect(ds == [10, 11])
     }
@@ -112,12 +116,12 @@ struct SharedTests {
             a.append(Payload(20))
             a.append(Payload(21))
             var b = a
-            b.append(Payload(22))                   // clone: two boxes, two storages
+            b.append(Payload(22))  // clone: two boxes, two storages
             let diverged = (a._boxID != b._boxID)
             #expect(diverged)
         }
         let ds = Probe.destroyedSorted
-        #expect(ds == [20, 21, 22])                 // shared refs released to zero exactly once
+        #expect(ds == [20, 21, 22])  // shared refs released to zero exactly once
     }
 
     @Test
@@ -148,13 +152,14 @@ struct SharedTests {
         var b: SharedColumn<Int> = makeShared(capacity: 8)
         b.append(1)
         b.append(2)
-        #expect(a == b)                             // element-wise, capacity-independent
+        #expect(a == b)  // element-wise, capacity-independent
         b.append(3)
         #expect(a != b)
-        var h1 = Hasher(), h2 = Hasher()
+        var h1 = Hasher()
+        var h2 = Hasher()
         a.hash(into: &h1)
         var a2 = a
-        a2.ensureUnique()                           // distinct boxes, same elements
+        a2.ensureUnique()  // distinct boxes, same elements
         a2.hash(into: &h2)
         #expect(h1.finalize() == h2.finalize())
     }
@@ -175,14 +180,15 @@ struct SharedTests {
         }
         #expect(sum == 6)
 
-        let b = a                                   // share
+        let b = a  // share
         let bIDBefore = b._boxID
         a.withMutableSpan { span in
-            span[0] = 100                           // must NOT alias b
+            span[0] = 100  // must NOT alias b
         }
         let diverged = (a._boxID != bIDBefore)
-        #expect(diverged)                           // uniqueness restored BEFORE the view
-        let aSees = a[.zero], bSees = b[.zero]
+        #expect(diverged)  // uniqueness restored BEFORE the view
+        let aSees = a[.zero]
+        let bSees = b[.zero]
         #expect(aSees == 100)
         #expect(bSees == 1)
     }
@@ -194,22 +200,23 @@ struct SharedTests {
         var a: SharedColumn<Int> = makeShared(capacity: 2)
         a.append(1)
         a.append(2)
-        let b = a                                   // share the box
+        let b = a  // share the box
         let bIDBefore = b._boxID
-        a[.zero] = 100                              // the SEAM subscript._modify, no ADT gate above
+        a[.zero] = 100  // the SEAM subscript._modify, no ADT gate above
         let diverged = (a._boxID != bIDBefore)
-        #expect(diverged)                           // the seam itself restored uniqueness
-        let aSees = a[.zero], bSees = b[.zero]
+        #expect(diverged)  // the seam itself restored uniqueness
+        let aSees = a[.zero]
+        let bSees = b[.zero]
         #expect(aSees == 100)
         #expect(bSees == 1)
 
         var c: SharedColumn<Int> = makeShared(capacity: 2)
         c.append(7)
         let d = c
-        let moved = c.move(at: .zero)               // seam move on a shared box
+        let moved = c.move(at: .zero)  // seam move on a shared box
         #expect(moved == 7)
         let dSees = d[.zero]
-        #expect(dSees == 7)                         // sibling's element untouched by the move-out
+        #expect(dSees == 7)  // sibling's element untouched by the move-out
     }
 
     // MARK: - Sendable chain

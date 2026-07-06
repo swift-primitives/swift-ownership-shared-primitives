@@ -1,11 +1,11 @@
-import Ownership_Shared_Primitive
-import Buffer_Primitive
-import Buffer_Linear_Primitive
 import Buffer_Linear_Bounded_Primitive
-import Storage_Contiguous_Primitives
-import Memory_Heap_Primitives
-import Memory_Allocator_Primitive
+import Buffer_Linear_Primitive
+import Buffer_Primitive
 import Index_Primitives
+import Memory_Allocator_Primitive
+import Memory_Heap_Primitives
+import Ownership_Shared_Primitive
+import Storage_Contiguous_Primitives
 import Synchronization
 import Testing
 
@@ -32,7 +32,9 @@ private func makeShared<E>(capacity: UInt) -> SharedColumn<E> {
     SharedColumn<E>(HeapColumn<E>(minimumCapacity: Index<E>.Count(capacity)))
 }
 
-/// Thread-safe teardown ledger. The suite's siblings drop on TaskGroup worker
+/// Thread-safe teardown ledger.
+///
+/// The suite's siblings drop on TaskGroup worker
 /// threads, so the single-threaded `Probe` recorder idiom does not apply — exactness
 /// is counted atomically and asserted at quiescence.
 private enum Ledger {
@@ -70,8 +72,8 @@ struct SharedConcurrencyDetachTrivialTests {
         let outcomes = await withTaskGroup(of: (Int, [Int]).self, returning: [Int: [Int]].self) { group in
             for t in 0..<width {
                 group.addTask {
-                    var mine = frozen                       // sibling: shares the box
-                    mine.append(100 &+ t)                   // gate-first append → detach
+                    var mine = frozen  // sibling: shares the box
+                    mine.append(100 &+ t)  // gate-first append → detach
                     mine.withMutableSpan { span in
                         for i in 0..<span.count { span[i] &+= t }
                     }
@@ -91,8 +93,8 @@ struct SharedConcurrencyDetachTrivialTests {
         }
         #expect(outcomes.count == width)
         for t in 0..<width {
-            var model = Array(0..<8)                        // fork: the shared seed…
-            model.append(100 &+ t)                          // …plus this task's ops
+            var model = Array(0..<8)  // fork: the shared seed…
+            model.append(100 &+ t)  // …plus this task's ops
             model = model.map { $0 &+ t }
             model.removeLast()
             #expect(outcomes[t] == model)
@@ -102,7 +104,7 @@ struct SharedConcurrencyDetachTrivialTests {
             for i in 0..<span.count { out.append(span[i]) }
             return out
         }
-        #expect(source == Array(0..<8))                     // the source never moved
+        #expect(source == Array(0..<8))  // the source never moved
     }
 
     @Test(arguments: [2, 8])
@@ -115,10 +117,10 @@ struct SharedConcurrencyDetachTrivialTests {
             for t in 0..<width {
                 group.addTask {
                     var mine = frozen
-                    mine[0] = 1000 &+ t                     // self-gating seam write → detach
+                    mine[0] = 1000 &+ t  // self-gating seam write → detach
                     let mine0 = mine[0]
                     let mine1 = mine[1]
-                    let theirs0 = frozen[0]                 // lawful read on the shared box
+                    let theirs0 = frozen[0]  // lawful read on the shared box
                     let capacityPreserved = (mine.capacity == frozen.capacity)
                     return mine0 == 1000 &+ t && mine1 == 11 && theirs0 == 10 && capacityPreserved
                 }
@@ -151,7 +153,7 @@ struct SharedConcurrencyDetachTeardownTests {
                 for t in 0..<16 {
                     group.addTask {
                         var mine = frozen
-                        mine.append(Payload(100 &+ t))      // detach: the clone retains the seed refs
+                        mine.append(Payload(100 &+ t))  // detach: the clone retains the seed refs
                         mine.withMutableSpan { span in
                             for i in 0..<span.count where i % 2 == 0 {
                                 span[i] = Payload(span[i].value &+ 1000)
@@ -171,7 +173,7 @@ struct SharedConcurrencyDetachTeardownTests {
                         }
                         var model: [Int] = []
                         for i in 0..<8 { model.append(i % 2 == 0 ? i &+ 1000 : i) }
-                        model.append(1100 &+ t)                 // appended, then re-boxed
+                        model.append(1100 &+ t)  // appended, then re-boxed
                         return values == model
                     }
                 }

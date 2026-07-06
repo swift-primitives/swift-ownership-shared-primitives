@@ -1,12 +1,12 @@
-import Ownership_Shared_Primitive
-import Buffer_Primitive
 import Buffer_Linear_Primitive
 import Buffer_Linear_Primitives
-import Storage_Contiguous_Primitives
-import Memory_Heap_Primitives
-import Memory_Allocator_Primitive
-import Span_Protocol_Primitives
+import Buffer_Primitive
 import Index_Primitives
+import Memory_Allocator_Primitive
+import Memory_Heap_Primitives
+import Ownership_Shared_Primitive
+import Span_Protocol_Primitives
+import Storage_Contiguous_Primitives
 import Testing
 
 // The W1-4 laundered span (spike: .handoffs/probes-2026-06-11/shared-span-spike/):
@@ -42,7 +42,7 @@ struct SharedSpanProtocolTests {
         var sum = 0
         for i in direct.indices { sum &+= direct[i] }
         #expect(sum == 6)
-        #expect(total(s) == 6)                  // generic witness dispatch
+        #expect(total(s) == 6)  // generic witness dispatch
     }
 
     @Test
@@ -60,12 +60,12 @@ struct SharedSpanProtocolTests {
         column.append(2)
         column.append(3)
         let s = SharedColumn<Int>(column)
-        var sibling = s                         // share the box
+        var sibling = s  // share the box
         let live = s.span
-        sibling.append(99)                      // gate detaches the SIBLING first
+        sibling.append(99)  // gate detaches the SIBLING first
         var after = 0
         for i in live.indices { after &+= live[i] }
-        #expect(after == 6)                     // our box untouched — never torn
+        #expect(after == 6)  // our box untouched — never torn
         let siblingCount = sibling.count
         #expect(siblingCount == Index<Int>.Count(4))
         let ourCount = s.count
