@@ -61,7 +61,7 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     // The hop helpers: the buffer arrives as a PARAMETER (borrow / inout) — struct-containment
     // regime inside, so the buffer's own span surfaces compose soundly.
     @inlinable
-    internal static func _withSpan<R, Failure: Swift.Error>(
+    package static func _withSpan<R, Failure: Swift.Error>(
         _ buffer: borrowing Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear,
         _ body: (Swift.Span<Element>) throws(Failure) -> R
     ) throws(Failure) -> R {
@@ -69,7 +69,7 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     }
 
     @inlinable
-    internal static func _withMutableSpan<R, Failure: Swift.Error>(
+    package static func _withMutableSpan<R, Failure: Swift.Error>(
         _ buffer: inout Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear,
         _ body: (inout Swift.MutableSpan<Element>) throws(Failure) -> R
     ) throws(Failure) -> R {

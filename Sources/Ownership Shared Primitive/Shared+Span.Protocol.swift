@@ -53,7 +53,7 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// access) and extracts the raw window closure-scoped — the dependence chain
     /// stays inside this call frame.
     @inlinable
-    internal static func _window(
+    package static func _window(
         of column: borrowing B
     ) -> (base: UnsafeRawPointer?, count: Int) where B: Span.`Protocol`, B.Element == Element {
         unsafe column.span.withUnsafeBufferPointer { ptr in
