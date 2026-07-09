@@ -50,7 +50,7 @@ private final class Payload: Sendable {
 // MARK: - Trivial rung
 
 @Suite
-struct SharedConcurrencyStormTests {
+struct `Shared Concurrency Storm Tests` {
 
     @Test
     func `readers stay on the seed while writers detach away`() async {
@@ -154,7 +154,7 @@ struct SharedConcurrencyStormTests {
 // shared element instances + exact teardown at quiescence)
 
 @Suite(.serialized)
-struct SharedConcurrencyStormTeardownTests {
+struct `Shared Concurrency Storm Teardown Tests` {
 
     @Test
     func `refcounted storm: readers, writers, and exact teardown`() async {

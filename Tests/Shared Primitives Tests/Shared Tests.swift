@@ -57,7 +57,7 @@ private func makeSharedMoveOnly<E: ~Copyable>(capacity: UInt) -> SharedColumn<E>
 }
 
 @Suite(.serialized)
-struct SharedTests {
+struct `Shared Tests` {
 
     // MARK: - The conditional chain (the union, in one type)
 

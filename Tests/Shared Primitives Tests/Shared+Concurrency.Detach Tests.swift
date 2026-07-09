@@ -64,7 +64,7 @@ private final class Payload: Sendable {
 // MARK: - Trivial rung (value correctness under concurrent detach)
 
 @Suite
-struct SharedConcurrencyDetachTrivialTests {
+struct `Shared Concurrency Detach Trivial Tests` {
 
     @Test(arguments: [2, 8, 32])
     func `concurrent mutate-detach: every sibling matches its forked model`(width: Int) async {
@@ -142,7 +142,7 @@ struct SharedConcurrencyDetachTrivialTests {
 // file-global ledger observes one test's quiescence at a time)
 
 @Suite(.serialized)
-struct SharedConcurrencyDetachTeardownTests {
+struct `Shared Concurrency Detach Teardown Tests` {
 
     @Test
     func `refcounted elements: exact teardown after a concurrent detach storm`() async {

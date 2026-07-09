@@ -37,7 +37,7 @@
     }
 
     @Suite
-    struct SharedAssertLaneDeathTests {
+    struct `Shared Assert Lane Death Tests` {
 
         @Test
         func `appendAssumingUnique on a shared box dies in debug`() async {

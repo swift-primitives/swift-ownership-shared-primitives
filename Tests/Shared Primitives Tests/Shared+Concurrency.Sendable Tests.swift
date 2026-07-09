@@ -47,7 +47,7 @@ private struct Item: ~Copyable, Sendable {
 }
 
 @Suite
-struct SharedSendableSurfaceTests {
+struct `Shared Sendable Surface Tests` {
 
     @Test
     func `sendable composes across columns and rungs`() {

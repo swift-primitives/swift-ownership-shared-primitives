@@ -28,7 +28,7 @@ private func total<S: Span.`Protocol`>(_ s: borrowing S) -> Int where S.Element 
 }
 
 @Suite(.serialized)
-struct SharedSpanProtocolTests {
+struct `Shared Span Protocol Tests` {
 
     @Test
     func `the laundered span reads the boxed column, directly and via the witness`() {

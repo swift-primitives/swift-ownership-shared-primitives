@@ -61,7 +61,7 @@ private struct Item: ~Copyable {
 }
 
 @Suite
-struct SharedConcurrencySpanWindowTests {
+struct `Shared Concurrency Span Window Tests` {
 
     @Test(arguments: [4, 12])
     func `span borrows end before detach; the window holds under concurrency`(width: Int) async {
@@ -164,7 +164,7 @@ struct SharedConcurrencySpanWindowTests {
 // file-global ledger)
 
 @Suite(.serialized)
-struct SharedConcurrencyMoveOnlyTests {
+struct `Shared Concurrency Move Only Tests` {
 
     @Test
     func `concurrent task-local move-only columns: no-op gates and exact teardown`() async {

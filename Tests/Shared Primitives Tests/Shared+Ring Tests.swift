@@ -25,7 +25,7 @@ private typealias SharedBoundedRing<E: ~Copyable> = Ownership.Shared<E, BoundedR
 // MARK: - [DS-024]: the boxed ring columns are lawful
 
 @Suite
-struct SharedRingLawTests {
+struct `Shared Ring Law Tests` {
 
     @Test
     func `the shared growable-ring column obeys the seam ledger laws`() {
@@ -49,7 +49,7 @@ struct SharedRingLawTests {
 // MARK: - CoW value semantics on the ring column
 
 @Suite(.serialized)
-struct SharedRingCoWTests {
+struct `Shared Ring CoW Tests` {
 
     @Test
     func `copies share the box until a gated seam write diverges them`() {
@@ -90,7 +90,7 @@ struct SharedRingCoWTests {
 // MARK: - The scoped-access trio at the class hop
 
 @Suite(.serialized)
-struct SharedRingScopedAccessTests {
+struct `Shared Ring Scoped Access Tests` {
 
     @Test
     func `withUnique detaches first and reaches ops the seam cannot spell`() {
@@ -171,7 +171,7 @@ extension ScopedProbe {
 // MARK: - The box drain on the ring columns (R-5; the release leg runs the -O regime)
 
 @Suite(.serialized)
-struct SharedRingTeardownTests {
+struct `Shared Ring Teardown Tests` {
 
     @Test
     func `the box drain destroys live move-only elements exactly once`() {

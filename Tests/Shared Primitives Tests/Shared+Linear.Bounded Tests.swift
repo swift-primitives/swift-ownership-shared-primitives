@@ -24,7 +24,7 @@ private typealias SharedBoundedLinear<E: ~Copyable> = Ownership.Shared<E, Bounde
 // MARK: - [DS-024]: the boxed bounded-linear column is lawful
 
 @Suite
-struct SharedLinearBoundedLawTests {
+struct `Shared Linear Bounded Law Tests` {
 
     @Test
     func `the shared bounded-linear column obeys the seam ledger laws`() {
@@ -39,7 +39,7 @@ struct SharedLinearBoundedLawTests {
 // MARK: - CoW value semantics + the capacity contract
 
 @Suite(.serialized)
-struct SharedLinearBoundedCoWTests {
+struct `Shared Linear Bounded CoW Tests` {
 
     @Test
     func `copies share the box; a gated write detaches with capacity preserved exactly`() {
