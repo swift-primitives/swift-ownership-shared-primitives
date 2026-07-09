@@ -159,7 +159,9 @@ private struct ScopedItem: ~Copyable {
     deinit { ScopedProbe.recordDestroy(id) }
 }
 
-private enum ScopedProbe {
+private enum ScopedProbe {}
+
+extension ScopedProbe {
     nonisolated(unsafe) static var _destroyed: [Int] = []
     static func reset() { unsafe _destroyed = [] }
     static func recordDestroy(_ id: Int) { unsafe _destroyed.append(id) }
@@ -207,7 +209,9 @@ private struct DrainItem: ~Copyable {
     deinit { DrainProbe.recordDestroy(id) }
 }
 
-private enum DrainProbe {
+private enum DrainProbe {}
+
+extension DrainProbe {
     nonisolated(unsafe) static var _destroyed: [Int] = []
     static func reset() { unsafe _destroyed = [] }
     static func recordDestroy(_ id: Int) { unsafe _destroyed.append(id) }

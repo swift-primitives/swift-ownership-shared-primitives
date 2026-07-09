@@ -37,7 +37,9 @@ private func makeSharedMoveOnly<E: ~Copyable>(capacity: UInt) -> SharedColumn<E>
     SharedColumn<E>(HeapColumn<E>(minimumCapacity: Index<E>.Count(capacity)))
 }
 
-private enum Ledger {
+private enum Ledger {}
+
+extension Ledger {
     static let created = Atomic<Int>(0)
     static let destroyed = Atomic<Int>(0)
     static func reset() {

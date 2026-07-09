@@ -37,7 +37,9 @@ private func makeShared<E>(capacity: UInt) -> SharedColumn<E> {
 /// The suite's siblings drop on TaskGroup worker
 /// threads, so the single-threaded `Probe` recorder idiom does not apply — exactness
 /// is counted atomically and asserted at quiescence.
-private enum Ledger {
+private enum Ledger {}
+
+extension Ledger {
     static let created = Atomic<Int>(0)
     static let destroyed = Atomic<Int>(0)
     static func reset() {
