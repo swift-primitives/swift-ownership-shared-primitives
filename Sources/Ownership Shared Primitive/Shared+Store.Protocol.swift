@@ -55,6 +55,18 @@ extension Ownership.Shared: Store.`Protocol` where Element: ~Copyable, B: ~Copya
         return box.unguarded.move(at: slot)
     }
 
+    /// Exchanges the initialized elements at `i` and `j` in place, restoring uniqueness first.
+    ///
+    /// `Shared` forwards `move(at:)` into a guarding conformer (`box.unguarded`), so it
+    /// inherits the guarding property described on the requirement itself
+    /// (`Store.Protocol.swift:70-84` in swift-storage-primitives) and must override the
+    /// defaulted pairing-swap witness rather than inherit it.
+    @inlinable
+    public mutating func swapAt(_ i: Index<Element>, _ j: Index<Element>) {
+        ensureUnique()
+        box.unguarded.swapAt(i, j)
+    }
+
     /// The semantic mutation gate — restores uniqueness before generic seam writes.
     ///
     /// Generic ADT code calls this before its first write in any semantic mutation,
