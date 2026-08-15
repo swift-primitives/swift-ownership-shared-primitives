@@ -29,7 +29,9 @@ struct `Shared Linear Bounded Law Tests` {
     @Test
     func `the shared bounded-linear column obeys the seam ledger laws`() {
         let violations = Seam.Ledger.violations(
-            makeEmpty: { SharedBoundedLinear<Int>(BoundedLinear<Int>(minimumCapacity: Index<Int>.Count(4))) },
+            makeEmpty: {
+                SharedBoundedLinear<Int>(BoundedLinear<Int>(minimumCapacity: Index<Int>.Count(4)))
+            },
             element: { $0 }
         )
         #expect(violations.isEmpty, "\(violations)")
@@ -64,7 +66,9 @@ struct `Shared Linear Bounded CoW Tests` {
     func `a move-only bounded column drains through the box deinit`() {
         BoundedProbe.reset()
         do {
-            var s = SharedBoundedLinear<BoundedItem>(BoundedLinear<BoundedItem>(minimumCapacity: Index<BoundedItem>.Count(2)))
+            var s = SharedBoundedLinear<BoundedItem>(
+                BoundedLinear<BoundedItem>(minimumCapacity: Index<BoundedItem>.Count(2))
+            )
             s.initialize(at: 0, to: BoundedItem(7))
             s.initialize(at: 1, to: BoundedItem(8))
             let n = s.count

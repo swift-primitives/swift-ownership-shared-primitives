@@ -71,7 +71,8 @@ struct `Shared Concurrency Detach Trivial Tests` {
         var proto: SharedColumn<Int> = makeShared(capacity: 16)
         for i in 0..<8 { proto.append(i) }
         let frozen = proto
-        let outcomes = await withTaskGroup(of: (Int, [Int]).self, returning: [Int: [Int]].self) { group in
+        let outcomes = await withTaskGroup(of: (Int, [Int]).self, returning: [Int: [Int]].self) {
+            group in
             for t in 0..<width {
                 group.addTask {
                     var mine = frozen  // sibling: shares the box

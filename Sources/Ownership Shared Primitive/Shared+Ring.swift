@@ -28,14 +28,20 @@ public import Storage_Contiguous_Primitives
 extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// Wraps a growable heap-ring buffer as a statically-unique (move-only element) column.
     @inlinable
-    public init(_ buffer: consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring)
+    public init(
+        _ buffer: consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring
+    )
     where B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring {
         self.init(box: Ownership.Box(buffer, drain: { $0.removeAll() }))
     }
 
     /// Wraps a bounded heap-ring buffer as a statically-unique (move-only element) column.
     @inlinable
-    public init(_ buffer: consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring.Bounded)
+    public init(
+        _ buffer:
+            consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring
+            .Bounded
+    )
     where B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring.Bounded {
         self.init(box: Ownership.Box(buffer, drain: { $0.remove.all() }))
     }
@@ -44,7 +50,9 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
 extension Ownership.Shared where Element: Copyable, B: ~Copyable {
     /// Wraps a growable heap-ring buffer as a shared (CoW-capable) column.
     @inlinable
-    public init(_ buffer: consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring)
+    public init(
+        _ buffer: consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring
+    )
     where B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring {
         self.init(
             box: Ownership.Box(
@@ -57,7 +65,11 @@ extension Ownership.Shared where Element: Copyable, B: ~Copyable {
 
     /// Wraps a bounded heap-ring buffer as a shared (CoW-capable) column.
     @inlinable
-    public init(_ buffer: consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring.Bounded)
+    public init(
+        _ buffer:
+            consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring
+            .Bounded
+    )
     where B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Ring.Bounded {
         self.init(
             box: Ownership.Box(

@@ -31,7 +31,11 @@ public import Storage_Contiguous_Primitives
 extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// Wraps a bounded heap-linear buffer as a statically-unique (move-only element) column.
     @inlinable
-    public init(_ buffer: consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear.Bounded)
+    public init(
+        _ buffer:
+            consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear
+            .Bounded
+    )
     where B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear.Bounded {
         self.init(box: Ownership.Box(buffer, drain: { $0.remove.all() }))
     }
@@ -40,7 +44,11 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
 extension Ownership.Shared where Element: Copyable, B: ~Copyable {
     /// Wraps a bounded heap-linear buffer as a shared (CoW-capable) column.
     @inlinable
-    public init(_ buffer: consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear.Bounded)
+    public init(
+        _ buffer:
+            consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear
+            .Bounded
+    )
     where B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear.Bounded {
         self.init(
             box: Ownership.Box(

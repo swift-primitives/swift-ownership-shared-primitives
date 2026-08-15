@@ -39,7 +39,9 @@ struct `Shared Ring Law Tests` {
     @Test
     func `the shared bounded-ring column obeys the seam ledger laws`() {
         let violations = Seam.Ledger.violations(
-            makeEmpty: { SharedBoundedRing<Int>(BoundedRing<Int>(minimumCapacity: Index<Int>.Count(4))) },
+            makeEmpty: {
+                SharedBoundedRing<Int>(BoundedRing<Int>(minimumCapacity: Index<Int>.Count(4)))
+            },
             element: { $0 }
         )
         #expect(violations.isEmpty, "\(violations)")
@@ -114,7 +116,9 @@ struct `Shared Ring Scoped Access Tests` {
     func `withUnique(consuming:) threads a move-only payload into the column`() {
         ScopedProbe.reset()
         do {
-            var s = SharedRing<ScopedItem>(GrowableRing<ScopedItem>(minimumCapacity: Index<ScopedItem>.Count(2)))
+            var s = SharedRing<ScopedItem>(
+                GrowableRing<ScopedItem>(minimumCapacity: Index<ScopedItem>.Count(2))
+            )
             s.withUnique(consuming: ScopedItem(1)) { ring, item in
                 ring.pushBack(item)
             }
@@ -177,7 +181,9 @@ struct `Shared Ring Teardown Tests` {
     func `the box drain destroys live move-only elements exactly once`() {
         DrainProbe.reset()
         do {
-            var s = SharedRing<DrainItem>(GrowableRing<DrainItem>(minimumCapacity: Index<DrainItem>.Count(4)))
+            var s = SharedRing<DrainItem>(
+                GrowableRing<DrainItem>(minimumCapacity: Index<DrainItem>.Count(4))
+            )
             s.initialize(at: Index<DrainItem>(Ordinal(UInt(0))), to: DrainItem(1))
             s.initialize(at: Index<DrainItem>(Ordinal(UInt(1))), to: DrainItem(2))
             let taken = s.move(at: Index<DrainItem>(Ordinal(UInt(0))))
@@ -195,7 +201,9 @@ struct `Shared Ring Teardown Tests` {
     func `the bounded box drain tears down its live elements`() {
         DrainProbe.reset()
         do {
-            var s = SharedBoundedRing<DrainItem>(BoundedRing<DrainItem>(minimumCapacity: Index<DrainItem>.Count(2)))
+            var s = SharedBoundedRing<DrainItem>(
+                BoundedRing<DrainItem>(minimumCapacity: Index<DrainItem>.Count(2))
+            )
             s.initialize(at: Index<DrainItem>(Ordinal(UInt(0))), to: DrainItem(5))
         }
         let all = DrainProbe.destroyedSorted

@@ -95,7 +95,9 @@ struct `Shared Concurrency Storm Tests` {
     }
 
     @Test(arguments: [4, 16])
-    func `interleaved read-mutate storms on independent siblings match their models`(width: Int) async {
+    func `interleaved read-mutate storms on independent siblings match their models`(
+        width: Int
+    ) async {
         var proto: SharedColumn<Int> = makeShared(capacity: 8)
         for i in 0..<4 { proto.append(i) }
         let frozen = proto

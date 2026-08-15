@@ -41,7 +41,10 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     public mutating func withMutableSpan<R, Failure: Swift.Error>(
         _ body: (inout Swift.MutableSpan<Element>) throws(Failure) -> R
     ) throws(Failure) -> R
-    where B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear, Element: Copyable {
+    where
+        B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear,
+        Element: Copyable
+    {
         ensureUnique()
         return try Self._withMutableSpan(&box.unguarded, body)
     }
@@ -62,7 +65,8 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     // regime inside, so the buffer's own span surfaces compose soundly.
     @inlinable
     package static func _withSpan<R, Failure: Swift.Error>(
-        _ buffer: borrowing Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear,
+        _ buffer:
+            borrowing Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear,
         _ body: (Swift.Span<Element>) throws(Failure) -> R
     ) throws(Failure) -> R {
         try body(buffer.span)
