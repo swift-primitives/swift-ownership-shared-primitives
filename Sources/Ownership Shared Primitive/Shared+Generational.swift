@@ -27,7 +27,9 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// Wraps a generational (slot-map) store as a statically-unique (move-only element)
     /// column.
     @inlinable
-    public init(_ store: consuming Storage<Memory.Allocator<Memory.Heap>.Pool>.Generational<Element>)
+    public init(
+        _ store: consuming Storage<Memory.Allocator<Memory.Heap>.Pool>.Generational<Element>
+    )
     where B == Storage<Memory.Allocator<Memory.Heap>.Pool>.Generational<Element> {
         self.init(box: Ownership.Box(store, drain: { $0.removeAll() }))
     }
@@ -36,7 +38,9 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
 extension Ownership.Shared where Element: Copyable, B: ~Copyable {
     /// Wraps a generational (slot-map) store as a shared (CoW-capable) column.
     @inlinable
-    public init(_ store: consuming Storage<Memory.Allocator<Memory.Heap>.Pool>.Generational<Element>)
+    public init(
+        _ store: consuming Storage<Memory.Allocator<Memory.Heap>.Pool>.Generational<Element>
+    )
     where B == Storage<Memory.Allocator<Memory.Heap>.Pool>.Generational<Element> {
         self.init(
             box: Ownership.Box(

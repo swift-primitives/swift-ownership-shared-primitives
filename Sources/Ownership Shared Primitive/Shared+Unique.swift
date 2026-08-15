@@ -27,7 +27,10 @@ public import Storage_Contiguous_Primitives
 extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// Wraps a dense heap-linear buffer as a statically-unique (move-only element) column.
     @inlinable
-    public init(_ buffer: consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear)
+    public init(
+        _ buffer:
+            consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear
+    )
     where B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear {
         self.init(box: Ownership.Box(buffer, drain: { $0.removeAll(keepingCapacity: true) }))
     }
@@ -36,7 +39,10 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
 extension Ownership.Shared where Element: Copyable, B: ~Copyable {
     /// Wraps a dense heap-linear buffer as a shared (CoW-capable) column.
     @inlinable
-    public init(_ buffer: consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear)
+    public init(
+        _ buffer:
+            consuming Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear
+    )
     where B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear {
         self.init(
             box: Ownership.Box(
@@ -88,7 +94,10 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// CoW-checked for Copyable elements.
     @inlinable
     public mutating func append(_ element: consuming Element)
-    where B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear, Element: Copyable {
+    where
+        B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear,
+        Element: Copyable
+    {
         ensureUnique()
         box.unguarded.append(element)
     }
@@ -112,7 +121,10 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     @inlinable
     public mutating func removeLast()
         -> Element
-    where B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear, Element: Copyable {
+    where
+        B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear,
+        Element: Copyable
+    {
         ensureUnique()
         return box.unguarded.removeLast()
     }
@@ -131,7 +143,10 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// Ensures at least `minimumCapacity` slots, growing (uniquely) if needed.
     @inlinable
     public mutating func reserveCapacity(_ minimumCapacity: Index<Element>.Count)
-    where B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear, Element: Copyable {
+    where
+        B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear,
+        Element: Copyable
+    {
         ensureUnique()
         box.unguarded.reserveCapacity(minimumCapacity)
     }
@@ -139,7 +154,10 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     /// Grows or shrinks storage to exactly `newCapacity`, preserving elements (uniquely).
     @inlinable
     public mutating func reallocate(capacity newCapacity: Index<Element>.Count)
-    where B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear, Element: Copyable {
+    where
+        B == Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<Element>>.Linear,
+        Element: Copyable
+    {
         ensureUnique()
         box.unguarded.reallocate(capacity: newCapacity)
     }
