@@ -56,7 +56,7 @@ extension Ownership.Shared where Element: ~Copyable, B: ~Copyable {
     package static func _window(
         of column: borrowing B
     ) -> (base: UnsafeRawPointer?, count: Int) where B: Span.`Protocol`, B.Element == Element {
-        unsafe column.span.withUnsafeBufferPointer { ptr in
+        column.span.withUnsafeBufferPointer { ptr in
             unsafe (UnsafeRawPointer(ptr.baseAddress), ptr.count)
         }
     }
