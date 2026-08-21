@@ -9,10 +9,6 @@ import Ownership_Shared_Primitive
 import Storage_Contiguous_Primitives
 import Testing
 
-// The ring CoW columns (ASK-C, 2026-06-10): the four pinned constructor pairs + the
-// scoped-access trio, exercised against the ratified ring seam. Mirrors the
-// ratification spike (.handoffs/probes-2026-06-10/queue-family-spike/).
-
 private typealias HeapStorage<E: ~Copyable> =
     Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>
 
@@ -21,8 +17,6 @@ private typealias BoundedRing<E: ~Copyable> = Buffer<HeapStorage<E>>.Ring.Bounde
 
 private typealias SharedRing<E: ~Copyable> = Ownership.Shared<E, GrowableRing<E>>
 private typealias SharedBoundedRing<E: ~Copyable> = Ownership.Shared<E, BoundedRing<E>>
-
-// MARK: - [DS-024]: the boxed ring columns are lawful
 
 @Suite
 struct `Shared Ring Law Tests` {
@@ -48,8 +42,6 @@ struct `Shared Ring Law Tests` {
     }
 }
 
-// MARK: - CoW value semantics on the ring column
-
 @Suite(.serialized)
 struct `Shared Ring CoW Tests` {
 
@@ -61,7 +53,7 @@ struct `Shared Ring CoW Tests` {
         let t = s
         let sharedBefore = (s._boxID == t._boxID)
         #expect(sharedBefore)
-        s[0] = 100  // self-gating _modify clones first
+        s[0] = 100
         let diverged = (s._boxID != t._boxID)
         #expect(diverged)
         let mine = s[0]
@@ -76,7 +68,7 @@ struct `Shared Ring CoW Tests` {
         s.initialize(at: 0, to: 7)
         s.initialize(at: 1, to: 8)
         let t = s
-        let popped = s.move(at: 0)  // gated front-pop; head re-anchors
+        let popped = s.move(at: 0)
         #expect(popped == 7)
         let mine = s.count
         let theirs = t.count
@@ -89,8 +81,6 @@ struct `Shared Ring CoW Tests` {
     }
 }
 
-// MARK: - The scoped-access trio at the class hop
-
 @Suite(.serialized)
 struct `Shared Ring Scoped Access Tests` {
 
@@ -100,7 +90,7 @@ struct `Shared Ring Scoped Access Tests` {
         s.initialize(at: 0, to: 2)
         let t = s
         s.withUnique { ring in
-            ring.pushFront(1)  // front-insert: a column op, not a seam op
+            ring.pushFront(1)
         }
         let myFront = s[0]
         let myCount = s.count
@@ -109,7 +99,7 @@ struct `Shared Ring Scoped Access Tests` {
         let theirCount = t.count
         #expect(theirCount == Index<Int>.Count(1))
         let theirFront = t[0]
-        #expect(theirFront == 2)  // the gate inside withUnique detached first
+        #expect(theirFront == 2)
     }
 
     @Test
@@ -125,10 +115,10 @@ struct `Shared Ring Scoped Access Tests` {
             let n = s.count
             #expect(n == Index<ScopedItem>.Count(1))
             let lived = ScopedProbe.destroyedSorted
-            #expect(lived.isEmpty)  // moved in, not destroyed
+            #expect(lived.isEmpty)
         }
         let all = ScopedProbe.destroyedSorted
-        #expect(all == [1])  // the box drain tore it down (R-5)
+        #expect(all == [1])
     }
 
     @Test
@@ -149,7 +139,7 @@ struct `Shared Ring Scoped Access Tests` {
         s.initialize(at: 0, to: 1)
         s.initialize(at: 1, to: 2)
         let rejected = s.withUnique { ring in
-            ring.push.back(3)  // full: the bounded ring hands it back
+            ring.push.back(3)
         }
         #expect(rejected == 3)
         let n = s.count
@@ -171,8 +161,6 @@ extension ScopedProbe {
     static func recordDestroy(_ id: Int) { unsafe _destroyed.append(id) }
     static var destroyedSorted: [Int] { unsafe _destroyed.sorted() }
 }
-
-// MARK: - The box drain on the ring columns (R-5; the release leg runs the -O regime)
 
 @Suite(.serialized)
 struct `Shared Ring Teardown Tests` {

@@ -8,23 +8,6 @@ import Storage_Contiguous_Primitives
 import Synchronization
 import Testing
 
-// W2 adversarial suite 3 — withUnique VS LIVE SPANS, lawful compositions only
-// (GOAL-tower-arc-shared-soundness §W2.3).
-//
-// Span borrows END before any detach; exclusivity + the `@_lifetime` window are
-// honored by construction at every call site below. The ACCEPTED residuals are NOT
-// test targets (per the c27eaa7 blessing record): sibling misuse is UB-by-contract
-// and same-handle overlap is compiler-excluded — no test here instantiates UB and
-// asserts a defined outcome.
-//
-// Move-only rung note (structural): siblings of a `~Copyable`-element column are
-// UNCONSTRUCTIBLE (`Shared: Copyable` requires `Element: Copyable`), so the
-// detach-race misuse class cannot exist for it BY CONSTRUCTION — that is the
-// design-strength datum, not a coverage gap. Cross-task transfer of a live
-// move-only column is STRUCTURED-only on 6.3.2 (the `sending` spike: the
-// `Task {}`/`addTask` escaping-capture wall, REPORT-W4 §ADDENDUM), so the lawful
-// concurrent surface exercised here is task-LOCAL columns + exact teardown.
-
 private typealias HeapColumn<E: ~Copyable> =
     Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear
 private typealias SharedColumn<E: ~Copyable> = Ownership.Shared<E, HeapColumn<E>>
@@ -48,7 +31,6 @@ extension Ledger {
     }
 }
 
-/// Move-only element with ledgered teardown (concurrent task-local columns).
 private struct Item: ~Copyable {
     let id: Int
     init(_ id: Int) {
@@ -74,17 +56,17 @@ struct `Shared Concurrency Span Window Tests` {
             for t in 0..<width {
                 group.addTask {
                     var mine = frozen
-                    let before = mine.withSpan { span in  // borrow ends at return…
+                    let before = mine.withSpan { span in
                         var acc = 0
                         for i in 0..<span.count { acc &+= span[i] }
                         return acc
                     }
                     let sharedBefore = (mine._boxID == frozen._boxID)
-                    mine.withUnique { column in  // …then the gate detaches
+                    mine.withUnique { column in
                         column.append(40 &+ t)
                     }
                     let diverged = (mine._boxID != frozen._boxID)
-                    let after = mine.withSpan { span in  // fresh borrow on the new box
+                    let after = mine.withSpan { span in
                         var acc = 0
                         for i in 0..<span.count { acc &+= span[i] }
                         return acc
@@ -131,7 +113,7 @@ struct `Shared Concurrency Span Window Tests` {
         #expect(outcomes.count == 12)
         #expect(outcomes.allSatisfy { $0 })
         let sourceUntouched = (proto._boxID == frozen._boxID)
-        #expect(sourceUntouched)  // reads NEVER detached anything
+        #expect(sourceUntouched)
     }
 
     @Test(arguments: [4, 12])
@@ -160,9 +142,6 @@ struct `Shared Concurrency Span Window Tests` {
     }
 }
 
-// MARK: - Move-only rung (task-local statically-unique columns; serialized for the
-// file-global ledger)
-
 @Suite(.serialized)
 struct `Shared Concurrency Move Only Tests` {
 
@@ -175,7 +154,7 @@ struct `Shared Concurrency Move Only Tests` {
                     var column: SharedColumn<Item> = makeSharedMoveOnly(capacity: 8)
                     column.appendAssumingUnique(Item(t &* 10))
                     column.appendAssumingUnique(Item(t &* 10 &+ 1))
-                    column.withUnique { buffer in  // the gate is the lawful no-op here
+                    column.withUnique { buffer in
                         buffer.append(Item(t &* 10 &+ 2))
                     }
                     let took = column.removeLastAssumingUnique()
@@ -183,7 +162,7 @@ struct `Shared Concurrency Move Only Tests` {
                     _ = consume took
                     let n = column.count
                     return tookID == t &* 10 &+ 2 && n == Index<Item>.Count(2)
-                }  // column dies in-task: box drains here
+                }
             }
             var out: [Bool] = []
             for await ok in group { out.append(ok) }
@@ -191,7 +170,7 @@ struct `Shared Concurrency Move Only Tests` {
         }
         #expect(outcomes.count == 12)
         #expect(outcomes.allSatisfy { $0 })
-        // 12 tasks × 3 items, every one destroyed exactly once on its task's thread.
+
         let created = Ledger.created.load(ordering: .sequentiallyConsistent)
         let destroyed = Ledger.destroyed.load(ordering: .sequentiallyConsistent)
         #expect(created == 36)

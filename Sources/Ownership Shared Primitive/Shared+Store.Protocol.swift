@@ -1,37 +1,13 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
 public import Buffer_Protocol_Primitives
 public import Index_Primitives
 public import Ownership_Box_Primitives
 public import Store_Protocol_Primitives
 
-// MARK: - The seam (SELF-GATING mutators) + the count surface
-//
-// `Shared` forwards the 4-op seam through the box so seam-generic composition reaches the
-// shared column uniformly. Every MUTATING seam op restores uniqueness FIRST (`ensureUnique()`):
-// `Shared` is conditionally `Sendable`, so an unchecked public mutator would let two threads
-// holding copies of one box race through safe-looking code. The check is one uniqueness branch
-// per op (delegated to `Ownership.Box.ensureUnique()`) — after the first restore in a batch the
-// box IS unique, so the branch is true and clone-free (batching economics survive). Reads stay
-// free.
-// The explicit `…AssumingUnique` spellings (`Shared+Unique.swift`) remain the ONLY unchecked
-// mutation lane, for proven-hot batches whose uniqueness the caller has already established.
-
 extension Ownership.Shared: Store.`Protocol` where Element: ~Copyable, B: ~Copyable {
-    /// The wrapped buffer's total slot capacity (forwarded, read-only — capacity changes flow through construction, not this seam).
+
     @inlinable
     public var capacity: Index<Element>.Count { box.unguarded.capacity }
 
-    /// Element access by slot; the setter path restores uniqueness before yielding a mutable reference.
     @inlinable
     public subscript(slot: Index<Element>) -> Element {
         _read { yield box.unguarded[slot] }
@@ -41,39 +17,24 @@ extension Ownership.Shared: Store.`Protocol` where Element: ~Copyable, B: ~Copya
         }
     }
 
-    /// Initializes the given slot with `element`, restoring uniqueness first.
     @inlinable
     public mutating func initialize(at slot: Index<Element>, to element: consuming Element) {
         ensureUnique()
         box.unguarded.initialize(at: slot, to: element)
     }
 
-    /// Moves the element out of the given slot, restoring uniqueness first.
     @inlinable
     public mutating func move(at slot: Index<Element>) -> Element {
         ensureUnique()
         return box.unguarded.move(at: slot)
     }
 
-    /// Exchanges the initialized elements at `i` and `j` in place, restoring uniqueness first.
-    ///
-    /// `Shared` forwards `move(at:)` into a guarding conformer (`box.unguarded`), so it
-    /// inherits the guarding property described on the requirement itself
-    /// (`Store.Protocol.swift:70-84` in swift-storage-primitives) and must override the
-    /// defaulted pairing-swap witness rather than inherit it.
     @inlinable
     public mutating func swapAt(_ i: Index<Element>, _ j: Index<Element>) {
         ensureUnique()
         box.unguarded.swapAt(i, j)
     }
 
-    /// The semantic mutation gate — restores uniqueness before generic seam writes.
-    ///
-    /// Generic ADT code calls this before its first write in any semantic mutation,
-    /// making protocol-keyed mutation (subscript `_modify`, removal, in-place edits)
-    /// copy-on-write-correct on this column without per-column pins. The seam's own
-    /// mutators above ALSO self-gate (defense in depth + Sendable soundness); after the
-    /// gate runs once, their per-op checks are clone-free true branches.
     @inlinable
     public mutating func unshare() {
         ensureUnique()
@@ -81,11 +42,7 @@ extension Ownership.Shared: Store.`Protocol` where Element: ~Copyable, B: ~Copya
 }
 
 extension Ownership.Shared: Buffer.`Protocol` where Element: ~Copyable, B: ~Copyable {
-    /// The number of live elements (forwarded from the wrapped buffer's cursor).
-    ///
-    /// M7: `count` is the concrete `Index<Element>.Count`; the former
-    /// `typealias Count` witness for the deleted `Buffer.Protocol.Count`
-    /// associated type is gone.
+
     @inlinable
     public var count: Index<Element>.Count { box.unguarded.count }
 }

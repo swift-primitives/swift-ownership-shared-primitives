@@ -8,15 +8,6 @@ import Storage_Contiguous_Primitives
 import Synchronization
 import Testing
 
-// W2 adversarial suite 2 — SIBLING STORMS (GOAL-tower-arc-shared-soundness §W2.2).
-//
-// Many siblings of one box under a mixed read/mutate TaskGroup storm. The sharpest
-// LAWFUL overlap lives here: reader siblings keep borrowing the ORIGINAL box while
-// writer siblings clone-read it during their detaches — concurrent reads of shared
-// storage with all writes confined to freshly-detached boxes. Postconditions:
-// sibling independence after divergence (each writer matches its model, every
-// reader observes the seed on every iteration) + exact teardown accounting.
-
 private typealias HeapColumn<E: ~Copyable> =
     Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear
 private typealias SharedColumn<E: ~Copyable> = Ownership.Shared<E, HeapColumn<E>>
@@ -47,8 +38,6 @@ private final class Payload: Sendable {
     }
 }
 
-// MARK: - Trivial rung
-
 @Suite
 struct `Shared Concurrency Storm Tests` {
 
@@ -59,7 +48,7 @@ struct `Shared Concurrency Storm Tests` {
         let frozen = proto
         let outcomes = await withTaskGroup(of: Bool.self, returning: [Bool].self) { group in
             for _ in 0..<8 {
-                group.addTask {  // reader: never mutates its sibling
+                group.addTask {
                     let mine = frozen
                     var good = true
                     for _ in 0..<250 {
@@ -73,13 +62,13 @@ struct `Shared Concurrency Storm Tests` {
                 }
             }
             for t in 0..<8 {
-                group.addTask {  // writer: detaches, then churns
+                group.addTask {
                     var mine = frozen
                     for k in 0..<99 {
                         mine.append(t &* 1000 &+ k)
                         if k % 3 == 0 { _ = mine.removeLast() }
                     }
-                    // appends 99, removals at k % 3 == 0 → 33; net 66 over the seed 4
+
                     let n = mine.count
                     return n == Index<Int>.Count(UInt(70))
                 }
@@ -152,9 +141,6 @@ struct `Shared Concurrency Storm Tests` {
     }
 }
 
-// MARK: - Refcounted rung (the same storm shape with retain/release traffic on
-// shared element instances + exact teardown at quiescence)
-
 @Suite(.serialized)
 struct `Shared Concurrency Storm Teardown Tests` {
 
@@ -166,12 +152,9 @@ struct `Shared Concurrency Storm Teardown Tests` {
             for i in 0..<4 { proto.append(Payload(i)) }
             let frozen = proto
             let outcomes = await withTaskGroup(of: Bool.self, returning: [Bool].self) { group in
-                // W2-F2 applies to every Span<Payload> closure in this group: values
-                // are EXTRACTED inside the borrow and verified outside (a Bool-flow
-                // closure over a class-element span crashes the 6.3.2 -O pipeline —
-                // see probes-2026-06-11/tsan-spike/w2-release-wall/).
+
                 for _ in 0..<6 {
-                    group.addTask {  // readers borrow the shared box
+                    group.addTask {
                         let mine = frozen
                         var good = true
                         for _ in 0..<150 {
@@ -187,7 +170,7 @@ struct `Shared Concurrency Storm Teardown Tests` {
                     }
                 }
                 for t in 0..<6 {
-                    group.addTask {  // writers detach + replace refs
+                    group.addTask {
                         var mine = frozen
                         for k in 0..<20 {
                             mine.append(Payload(t &* 100 &+ k))
@@ -214,7 +197,7 @@ struct `Shared Concurrency Storm Teardown Tests` {
             #expect(outcomes.count == 12)
             #expect(outcomes.allSatisfy { $0 })
         }
-        // 4 seed + 6 writers × (20 appended + 4 replacements) = 148, each destroyed once.
+
         let created = Ledger.created.load(ordering: .sequentiallyConsistent)
         let destroyed = Ledger.destroyed.load(ordering: .sequentiallyConsistent)
         #expect(created == 148)

@@ -9,17 +9,12 @@ import Span_Protocol_Primitives
 import Storage_Contiguous_Primitives
 import Testing
 
-// The W1-4 laundered span (spike: .handoffs/probes-2026-06-11/shared-span-spike/):
-// Shared: Span.Protocol where B: Span.Protocol — the conformance that admits the
-// Shared column to the span-bridged Collection lattice.
-
 private typealias HeapStorage<E: ~Copyable> =
     Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>
 
 private typealias HeapColumn<E: ~Copyable> = Buffer<HeapStorage<E>>.Linear
 private typealias SharedColumn<E: ~Copyable> = Ownership.Shared<E, HeapColumn<E>>
 
-/// Generic Span.Protocol-bound walk — the lattice dispatch shape.
 private func total<S: Span.`Protocol`>(_ s: borrowing S) -> Int where S.Element == Int {
     var sum = 0
     let span = s.span
@@ -42,7 +37,7 @@ struct `Shared Span Protocol Tests` {
         var sum = 0
         for i in direct.indices { sum &+= direct[i] }
         #expect(sum == 6)
-        #expect(total(s) == 6)  // generic witness dispatch
+        #expect(total(s) == 6)
     }
 
     @Test
@@ -60,12 +55,12 @@ struct `Shared Span Protocol Tests` {
         column.append(2)
         column.append(3)
         let s = SharedColumn<Int>(column)
-        var sibling = s  // share the box
+        var sibling = s
         let live = s.span
-        sibling.append(99)  // gate detaches the SIBLING first
+        sibling.append(99)
         var after = 0
         for i in live.indices { after &+= live[i] }
-        #expect(after == 6)  // our box untouched — never torn
+        #expect(after == 6)
         let siblingCount = sibling.count
         #expect(siblingCount == Index<Int>.Count(4))
         let ourCount = s.count

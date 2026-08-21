@@ -9,18 +9,6 @@ import Storage_Contiguous_Primitives
 import Synchronization
 import Testing
 
-// W2 adversarial suite 1 — DETACH RACES (GOAL-tower-arc-shared-soundness §W2.1).
-//
-// N tasks over sibling copies of one box, concurrent mutate→detach. Postconditions:
-// every task's end state matches a FORKED REFERENCE MODEL (the seed plus that task's
-// own ops), the source handle still sees the seed, and teardown oracles are EXACT
-// (created == destroyed at quiescence — no leak, no double-deinit). The suite runs
-// under the arc's TSan gate (REPORT-arc-shared-soundness-W1 §3): value correctness
-// here AND sanitizer silence there are one combined verdict.
-//
-// Columns: heap-linear (growable lane) + bounded-linear (the fixed column; its extra
-// postcondition is CAPACITY PRESERVATION through the concurrent detach).
-
 private typealias HeapColumn<E: ~Copyable> =
     Buffer<Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>>.Linear
 private typealias SharedColumn<E: ~Copyable> = Ownership.Shared<E, HeapColumn<E>>
@@ -32,11 +20,6 @@ private func makeShared<E>(capacity: UInt) -> SharedColumn<E> {
     SharedColumn<E>(HeapColumn<E>(minimumCapacity: Index<E>.Count(capacity)))
 }
 
-/// Thread-safe teardown ledger.
-///
-/// The suite's siblings drop on TaskGroup worker
-/// threads, so the single-threaded `Probe` recorder idiom does not apply — exactness
-/// is counted atomically and asserted at quiescence.
 private enum Ledger {}
 
 extension Ledger {
@@ -48,8 +31,6 @@ extension Ledger {
     }
 }
 
-/// Refcounted element rung: sibling clones share these instances across threads
-/// (retain/release traffic on the SAME objects during concurrent detaches).
 private final class Payload: Sendable {
     let value: Int
     init(_ value: Int) {
@@ -60,8 +41,6 @@ private final class Payload: Sendable {
         _ = Ledger.destroyed.wrappingAdd(1, ordering: .relaxed)
     }
 }
-
-// MARK: - Trivial rung (value correctness under concurrent detach)
 
 @Suite
 struct `Shared Concurrency Detach Trivial Tests` {
@@ -75,8 +54,8 @@ struct `Shared Concurrency Detach Trivial Tests` {
             group in
             for t in 0..<width {
                 group.addTask {
-                    var mine = frozen  // sibling: shares the box
-                    mine.append(100 &+ t)  // gate-first append → detach
+                    var mine = frozen
+                    mine.append(100 &+ t)
                     mine.withMutableSpan { span in
                         for i in 0..<span.count { span[i] &+= t }
                     }
@@ -96,8 +75,8 @@ struct `Shared Concurrency Detach Trivial Tests` {
         }
         #expect(outcomes.count == width)
         for t in 0..<width {
-            var model = Array(0..<8)  // fork: the shared seed…
-            model.append(100 &+ t)  // …plus this task's ops
+            var model = Array(0..<8)
+            model.append(100 &+ t)
             model = model.map { $0 &+ t }
             model.removeLast()
             #expect(outcomes[t] == model)
@@ -107,7 +86,7 @@ struct `Shared Concurrency Detach Trivial Tests` {
             for i in 0..<span.count { out.append(span[i]) }
             return out
         }
-        #expect(source == Array(0..<8))  // the source never moved
+        #expect(source == Array(0..<8))
     }
 
     @Test(arguments: [2, 8])
@@ -120,10 +99,10 @@ struct `Shared Concurrency Detach Trivial Tests` {
             for t in 0..<width {
                 group.addTask {
                     var mine = frozen
-                    mine[0] = 1000 &+ t  // self-gating seam write → detach
+                    mine[0] = 1000 &+ t
                     let mine0 = mine[0]
                     let mine1 = mine[1]
-                    let theirs0 = frozen[0]  // lawful read on the shared box
+                    let theirs0 = frozen[0]
                     let capacityPreserved = (mine.capacity == frozen.capacity)
                     return mine0 == 1000 &+ t && mine1 == 11 && theirs0 == 10 && capacityPreserved
                 }
@@ -139,9 +118,6 @@ struct `Shared Concurrency Detach Trivial Tests` {
     }
 }
 
-// MARK: - Refcounted rung (exact teardown across the storm; serialized so the
-// file-global ledger observes one test's quiescence at a time)
-
 @Suite(.serialized)
 struct `Shared Concurrency Detach Teardown Tests` {
 
@@ -156,18 +132,13 @@ struct `Shared Concurrency Detach Teardown Tests` {
                 for t in 0..<16 {
                     group.addTask {
                         var mine = frozen
-                        mine.append(Payload(100 &+ t))  // detach: the clone retains the seed refs
+                        mine.append(Payload(100 &+ t))
                         mine.withMutableSpan { span in
                             for i in 0..<span.count where i % 2 == 0 {
                                 span[i] = Payload(span[i].value &+ 1000)
                             }
                         }
-                        // W2-F2: verification stays OUTSIDE the Span<Payload> closure —
-                        // a guard/early-return Bool closure over a class-element span
-                        // crashes the 6.3.2 -O pipeline (CopyPropagation "leaked owned
-                        // value", signal 6; snapshot + log:
-                        // probes-2026-06-11/tsan-spike/w2-release-wall/). Extract the
-                        // values, compare against the model afterward.
+
                         let values = mine.withSpan { span in
                             var out: [Int] = []
                             out.reserveCapacity(span.count)
@@ -176,7 +147,7 @@ struct `Shared Concurrency Detach Teardown Tests` {
                         }
                         var model: [Int] = []
                         for i in 0..<8 { model.append(i % 2 == 0 ? i &+ 1000 : i) }
-                        model.append(1100 &+ t)  // appended, then re-boxed
+                        model.append(1100 &+ t)
                         return values == model
                     }
                 }
@@ -187,9 +158,7 @@ struct `Shared Concurrency Detach Teardown Tests` {
             #expect(checks.count == 16)
             #expect(checks.allSatisfy { $0 })
         }
-        // Quiescence: every sibling and the source died. Exact arithmetic: 8 seed
-        // payloads + 16 tasks × (1 appended + 5 replacements) = 104; every one
-        // destroyed exactly once.
+
         let created = Ledger.created.load(ordering: .sequentiallyConsistent)
         let destroyed = Ledger.destroyed.load(ordering: .sequentiallyConsistent)
         #expect(created == 104)

@@ -65,7 +65,7 @@ let package = Package(
         ),
     ],
     targets: [
-        // MARK: - The ratified W4 column combinator (PROPOSAL-tower-perfected-design §1.3, R-1/R-2)
+
         .target(
             name: "Ownership Shared Primitive",
             dependencies: [
@@ -108,7 +108,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Tests
         .testTarget(
             name: "Shared Primitives Tests",
             dependencies: [

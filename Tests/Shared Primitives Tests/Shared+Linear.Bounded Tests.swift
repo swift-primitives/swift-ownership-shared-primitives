@@ -9,19 +9,12 @@ import Ownership_Shared_Primitive
 import Storage_Contiguous_Primitives
 import Testing
 
-// The bounded-linear CoW column (ASK-W1-1, principal-ruled 2026-06-11): the pinned
-// constructor pair over Buffer.Linear.Bounded — the Stack.Bounded substrate. Mirrors
-// the ring pair's suite shape; the load-bearing extra is CAPACITY PRESERVATION
-// through a CoW detach (the clone is capacity-preserving by contract).
-
 private typealias HeapStorage<E: ~Copyable> =
     Storage<Memory.Allocator<Memory.Heap>>.Contiguous<E>
 
 private typealias BoundedLinear<E: ~Copyable> = Buffer<HeapStorage<E>>.Linear.Bounded
 
 private typealias SharedBoundedLinear<E: ~Copyable> = Ownership.Shared<E, BoundedLinear<E>>
-
-// MARK: - [DS-024]: the boxed bounded-linear column is lawful
 
 @Suite
 struct `Shared Linear Bounded Law Tests` {
@@ -38,8 +31,6 @@ struct `Shared Linear Bounded Law Tests` {
     }
 }
 
-// MARK: - CoW value semantics + the capacity contract
-
 @Suite(.serialized)
 struct `Shared Linear Bounded CoW Tests` {
 
@@ -52,10 +43,10 @@ struct `Shared Linear Bounded CoW Tests` {
         let t = s
         let sharedBefore = (s._boxID == t._boxID)
         #expect(sharedBefore)
-        s[0] = 100  // self-gating _modify clones first
+        s[0] = 100
         let diverged = (s._boxID != t._boxID)
         #expect(diverged)
-        #expect(s.capacity == capacityBefore)  // the capacity-preserving clone
+        #expect(s.capacity == capacityBefore)
         let mine = s[0]
         let theirs = t[0]
         #expect(mine == 100)
